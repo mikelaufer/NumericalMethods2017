@@ -1,0 +1,25 @@
+#+title: Homework Sample Template
+#+AUTHOR: Michael Laufer
+#+LATEX_HEADER: \usepackage{fancyhdr}
+# Don't export table of contents. 
+# Don't make a title page
+#+OPTIONS: toc:nil
+#+BIND: org-export-latex-title-command "" 
+# Don't do automatic section numbering
+#+LATEX: \setcounter{secnumdepth}{-1} 
+#+LATEX: \pagestyle{fancy}
+#+LATEX: \fancyhead{} 
+#+LATEX: \rhead{\textit{Michael Laufer}}
+#+LATEX: \lhead{\textit{Numerical Methods}}
+#+LATEX: \small
+* LaTEX Practice
+
+** Q1. Let's try some stuff out
+  + To see latex snippets use ctrl-( c x l). cancel with ctrl-(c c)
+  + How about some fractions? 
+\[\frac{1}{2} + 7 = 7.5\]
+  +  Let's try the continuity equation
+\[\frac{\partial \rho}{\partial t} + \nabla \cdot \left(\frac{1}{2}\rho u\right)\]
+
+
+ 

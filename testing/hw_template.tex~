@@ -1,0 +1,51 @@
+% Created 2017-10-20 Fri 15:40
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\usepackage{fancyhdr}
+\author{Michael Laufer}
+\date{\today}
+\title{Homework Sample Template}
+\hypersetup{
+  pdfkeywords={},
+  pdfsubject={},
+  pdfcreator={Emacs 25.3.1 (Org mode 8.2.10)}}
+\begin{document}
+
+\maketitle
+\setcounter{secnumdepth}{-1} # Don't do automatic section numbering
+\pagestyle{fancy}
+\fancyhead{}
+\rhead{\textit{Michael Laufer}}
+\lhead{\textit{Numerical Methods}}
+\small
+\section{LaTEX Practice}
+\label{sec-1}
+
+\subsection{Q1. Let's try some stuff out}
+\label{sec-1-1}
+\begin{itemize}
+\item To see latex snippets use ctrl-( c x l). cancel with ctrl-(c c)
+\item How about some fractions?
+\end{itemize}
+\[\frac{1}{2} + 7 = 7.5\]
+\begin{itemize}
+\item Let's try the continuity equation
+\end{itemize}
+\[\frac{\partial \rho}{\partial t} + \nabla \cdot \left(\frac{1}{2}\rho u\right)\]
+% Emacs 25.3.1 (Org mode 8.2.10)
+\end{document}
