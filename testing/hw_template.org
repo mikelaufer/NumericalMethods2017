@@ -1,18 +1,8 @@
-#+title: Homework Sample Template
-#+AUTHOR: Michael Laufer
-#+LATEX_HEADER: \usepackage{fancyhdr}
-# Don't export table of contents. 
-# Don't make a title page
-#+OPTIONS: toc:nil
-#+BIND: org-export-latex-title-command "" 
-# Don't do automatic section numbering
-#+LATEX: \setcounter{secnumdepth}{-1} 
-#+LATEX: \pagestyle{fancy}
-#+LATEX: \fancyhead{} 
-#+LATEX: \rhead{\textit{Michael Laufer}}
-#+LATEX: \lhead{\textit{Numerical Methods}}
-#+LATEX: \small
 * LaTEX Practice
+** Dependencies
+1. linux package aspell-en
+2. emacs packages: flyspell, cdlatex, auctex, texlive?
+3. Make sure that preamble.tex is in the same folder as the org document
 
 ** Q1. Let's try some stuff out
   + To see latex snippets use ctrl-( c x l). cancel with ctrl-(c c)
@@ -21,5 +11,33 @@
   +  Let's try the continuity equation
 \[\frac{\partial \rho}{\partial t} + \nabla \cdot \left(\frac{1}{2}\rho u\right)\]
 
+Pure Latex seems to work as well:
+\begin{equation}
+\frac{1}{2} + 6x + x^{2}
+\end{equation}
 
- 
+cdlatex mode allows for auto-completion:
+1. using fr <tab> creates fraction template
+2. using ^ raises to a power. $x^{2}$
+3. equ <tab> creates numbered equation template
+4. tilda key opens menu of shortcuts, so tilda d creates $\delta$. Tilda-tilda d creates $\partial$.
+
+** Workflow
+- words in org mode
+- math in latex with cdlatex
+- export as pdf with M-x org-latex-export-to-pdf RET
+** ToDo list: [0/4]
+- [ ] Learn how to insert figures with descriptions
+- [ ] learn how to use bibliography
+- [ ] learn how to insert code snippets
+- [ ] Learn how to create figure list,
+
+* Org and Latex config :noexport:
+#+title: Homework Sample Template
+#+AUTHOR: Michael Laufer testing
+# Don't make a title page
+#+OPTIONS: toc:nil
+#+BIND: org-export-latex-t
+#+latex_header: \input {preamble.tex}
+
+

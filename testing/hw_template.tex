@@ -1,4 +1,4 @@
-% Created 2017-10-20 Fri 15:40
+% Created 2017-10-22 Sun 22:46
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -16,8 +16,8 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 \tolerance=1000
-\usepackage{fancyhdr}
-\author{Michael Laufer}
+\input {preamble.tex}
+\author{Michael Laufer testing}
 \date{\today}
 \title{Homework Sample Template}
 \hypersetup{
@@ -27,17 +27,18 @@
 \begin{document}
 
 \maketitle
-\setcounter{secnumdepth}{-1}
-\pagestyle{fancy}
-\fancyhead{}
-\rhead{\textit{Michael Laufer}}
-\lhead{\textit{Numerical Methods}}
-\small
 \section{LaTEX Practice}
 \label{sec-1}
+\subsection{Dependencies}
+\label{sec-1-1}
+\begin{enumerate}
+\item linux package aspell-en
+\item emacs packages: flyspell, cdlatex, auctex, texlive?
+\item Make sure that preamble.tex is in the same folder as the org document
+\end{enumerate}
 
 \subsection{Q1. Let's try some stuff out}
-\label{sec-1-1}
+\label{sec-1-2}
 \begin{itemize}
 \item To see latex snippets use ctrl-( c x l). cancel with ctrl-(c c)
 \item How about some fractions?
@@ -47,5 +48,34 @@
 \item Let's try the continuity equation
 \end{itemize}
 \[\frac{\partial \rho}{\partial t} + \nabla \cdot \left(\frac{1}{2}\rho u\right)\]
+
+Pure Latex seems to work as well:
+\begin{equation}
+\frac{1}{2} + 6x + x^{2}
+\end{equation}
+
+cdlatex mode allows for auto-completion:
+\begin{enumerate}
+\item using fr <tab> creates fraction template
+\item using \^{} raises to a power. $x^{2}$
+\item equ <tab> creates numbered equation template
+\item tilda key opens menu of shortcuts, so tilda d creates $\delta$. Tilda-tilda d creates $\partial$.
+\end{enumerate}
+
+\subsection{Workflow}
+\label{sec-1-3}
+\begin{itemize}
+\item words in org mode
+\item math in latex with cdlatex
+\item export as pdf with M-x org-latex-export-to-pdf RET
+\end{itemize}
+\subsection{ToDo list: [0/4]}
+\label{sec-1-4}
+\begin{itemize}
+\item $\square$ Learn how to insert figures with descriptions
+\item $\square$ learn how to use bibliography
+\item $\square$ learn how to insert code snippets
+\item $\square$ Learn how to create figure list,
+\end{itemize}
 % Emacs 25.3.1 (Org mode 8.2.10)
 \end{document}
