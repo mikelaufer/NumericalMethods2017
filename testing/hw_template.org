@@ -2,7 +2,11 @@
 ** Dependencies
 1. linux package aspell-en
 2. emacs packages: flyspell, cdlatex, auctex, texlive?
-3. Make sure that preamble.tex is in the same folder as the org document
+3. Make sure that preamble.tex is (setq org-src-fontify-natively t)in the same fo(setq org-latex-listings 'minted
+      org-latex-packages-alist '(("" "minted"))
+      org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))lder as the org document
 
 ** Q1. Let's try some stuff out
   + To see latex snippets use ctrl-( c x l). cancel with ctrl-(c c)
@@ -31,6 +35,21 @@ cdlatex mode allows for auto-completion:
 - [ ] learn how to use bibliography
 - [ ] learn how to insert code snippets
 - [ ] Learn how to create figure list,
+
+** Q2. Let's try out some code snippets:
+- Code snippet created with <s <TAB>
+- evaluate code snippet with 
+#+BEGIN_SRC python :session:
+testlist = []
+for i in range(10):
+    if i > 5:
+        testlist.append(i)
+return(testlist)
+
+#+END_SRC
+
+#+RESULTS:
+| 6 | 7 | 8 | 9 |
 
 * Org and Latex config :noexport:
 #+title: Homework Sample Template

@@ -1,0 +1,7 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{testlist} \PYG{o}{=} \PYG{p}{[]}
+\PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{):}
+    \PYG{k}{if} \PYG{n}{i} \PYG{o}{\PYGZgt{}} \PYG{l+m+mi}{5}\PYG{p}{:}
+	\PYG{n}{testlist}\PYG{o}{.}\PYG{n}{append}\PYG{p}{(}\PYG{n}{i}\PYG{p}{)}
+\PYG{k}{return}\PYG{p}{(}\PYG{n}{testlist}\PYG{p}{)}
+\end{Verbatim}

@@ -1,4 +1,4 @@
-% Created 2017-10-23 Mon 18:56
+% Created 2017-10-23 Mon 18:53
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -16,7 +16,6 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 \tolerance=1000
-\usepackage{minted}
 \input {preamble.tex}
 \author{Michael Laufer testing}
 \date{\today}
@@ -35,11 +34,7 @@
 \begin{enumerate}
 \item linux package aspell-en
 \item emacs packages: flyspell, cdlatex, auctex, texlive?
-\item Make sure that preamble.tex is (setq org-src-fontify-natively t)in the same fo(setq org-latex-listings 'minted
-org-latex-packages-alist '(("" "minted"))
-org-latex-pdf-process
-'("pdflatex -shell-escape -interaction nonstopmode -output-directory \%o \%f"
-  "pdflatex -shell-escape -interaction nonstopmode -output-directory \%o \%f"))lder as the org document
+\item Make sure that preamble.tex is (setq org-src-fontify-natively t)in the same folder as the org document
 \end{enumerate}
 
 \subsection{Q1. Let's try some stuff out}
@@ -89,12 +84,12 @@ cdlatex mode allows for auto-completion:
 \item Code snippet created with <s <TAB>
 \item evaluate code snippet with
 \end{itemize}
-\begin{minted}[]{python}
+\begin{verbatim}
 testlist = []
 for i in range(10):
     if i > 5:
 	testlist.append(i)
 return(testlist)
-\end{minted}
+\end{verbatim}
 % Emacs 25.3.1 (Org mode 8.2.10)
 \end{document}

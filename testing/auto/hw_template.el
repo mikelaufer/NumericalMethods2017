@@ -31,12 +31,14 @@
     "marvosym"
     "wasysym"
     "amssymb"
-    "hyperref")
+    "hyperref"
+    "minted")
    (LaTeX-add-labels
     "sec-1"
     "sec-1-1"
     "sec-1-2"
     "sec-1-3"
-    "sec-1-4"))
+    "sec-1-4"
+    "sec-1-5"))
  :latex)
 
