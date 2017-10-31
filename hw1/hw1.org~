@@ -1,0 +1,14 @@
+* 1.2 Galerkin FE 
+** Part1
+The analytical solution is found by integrating twice with respect to $\Phi$
+
+* Org and Latex config :noexport:
+# title: HW1 Numerical Methods Fall 2017
+# AUTHOR: Michael Laufer
+# Don't make a title page
+#+OPTIONS: toc:nil
+#+BIND: org-export-latex-t
+#+latex_header: \input {preamble.tex}
+
+
+

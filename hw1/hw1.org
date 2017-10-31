@@ -1,0 +1,37 @@
+* 1.2 Galerkin FE method
+** Part1
+The analytical solution is found by integrating twice with respect to $\Phi$ and plugging in the provided boundary conditions.
+\[
+\phi(x) = -\cos(x) + (1 + \cos(1))x +1
+\]
+We will follow the same procedure as Example 1.1, and choose the same top-hat linear base functions but with a different right hand side.
+Noticing that the same boundary conditions are used, we can infer that $a_{1}=0$ and $a_{n}=1$  
+Using the same basis function gives us the same stiffness matrix: \\ 
+if $i\neq j$, $K_{j,i} = 2 / \Delta x$ \\
+if $i=j$, $K_{j,i} = -1 / \Delta x$ \\
+The load vector is computed using integration by parts:
+\[
+F_{j}=-\int_{0}^{1} \cos x \psi(x)dx = \frac{-1}{\Delta x} \left(\int_{x_{i-1}}^{x_{i}} \cos x \left(x -x_{i-1} \right)dx + \int_{x_{i}}^{x_{i+1}} \cos x \left(x_{i+1} -x \right)dx \right) =
+\]
+\[
+\frac{-1}{\Delta x} \left( \sin x_{i}(2x_{i}-x_{i-1}-x_{i+1} -2) + \sin x_{i-1} +\sin x_{i+1}\right)
+\] 
+which is valid for $2 \leq j \leq n-1$
+
+Leading to the equation: 
+\[
+K_{j,i}a_{i}=F_{j}
+\]
+solving for the remaining $n-2$ unknown nodes using the Scipy linear algebra solver:
+
+
+* Org and Latex config :noexport:
+#+title: HW1 Numerical Methods Fall 2017
+#+AUTHOR: Michael Laufer
+# Don't make a title page
+#+OPTIONS: toc:nil
+#+BIND: org-export-latex-t
+# latex_header: \input {preamble.tex}
+
+
+

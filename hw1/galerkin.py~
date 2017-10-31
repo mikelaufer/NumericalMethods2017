@@ -1,0 +1,12 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.linalg import solve
+
+
+def galerkin 1d(nx):
+    x = np.linspace(0,1,nx)
+    dx = 1.0/(nx-1)
+    K = (2/dx)*np.ones((nx-2,nx-2))
+    np.fill_diagonal(K,-1/dx)
+    F = (-1/dx)*(np.sin((x[1:-1])*(2*x[1:-1]) - x[:-2] -x[2:] -2) + np.sin(x[:-2]) + np.sin(x[2:]))
+    a = np.concatenate([[0], solve(K,F), [1]])

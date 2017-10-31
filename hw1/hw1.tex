@@ -1,0 +1,58 @@
+% Created 2017-10-31 Tue 15:30
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{minted}
+\author{Michael Laufer}
+\date{\today}
+\title{HW1 Numerical Methods Fall 2017}
+\hypersetup{
+ pdfauthor={Michael Laufer},
+ pdftitle={HW1 Numerical Methods Fall 2017},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 25.2.2 (Org mode 9.0.9)}, 
+ pdflang={English}}
+\begin{document}
+
+\maketitle
+\section{1.2 Galerkin FE method}
+\label{sec:org881168f}
+\subsection{Part1}
+\label{sec:org6ce8ca2}
+The analytical solution is found by integrating twice with respect to \(\Phi\) and plugging in the provided boundary conditions.
+\[
+\phi(x) = -\cos(x) + (1 + \cos(1))x +1
+\]
+We will follow the same procedure as Example 1.1, and choose the same top-hat linear base functions but with a different right hand side.
+Noticing that the same boundary conditions are used, we can infer that \(a_{1}=0\) and \(a_{n}=1\)  
+Using the same basis function gives us the same stiffness matrix: \\
+if \(i\neq j\), \(K_{j,i} = 2 / \Delta x\) \\
+if \(i=j\), \(K_{j,i} = -1 / \Delta x\) \\
+The load vector is computed using integration by parts:
+\[
+F_{j}=-\int_{0}^{1} \cos x \psi(x)dx = \frac{-1}{\Delta x} \left(\int_{x_{i-1}}^{x_{i}} \cos x \left(x -x_{i-1} \right)dx + \int_{x_{i}}^{x_{i+1}} \cos x \left(x_{i+1} -x \right)dx \right) =
+\]
+\[
+\frac{-1}{\Delta x} \left( \sin x_{i}(2x_{i}-x_{i-1}-x_{i+1} -2) + \sin x_{i-1} +\sin x_{i+1}\right)
+\] 
+which is valid for \(2 \leq j \leq n-1\)
+
+Leading to the equation: 
+\[
+K_{j,i}a_{i}=F_{j}
+\]
+solving for the remaining \(n-2\) unknown nodes using the Scipy linear algebra solver:
+\end{document}
