@@ -1,48 +1,85 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.linalg import solve
+from scipy.linalg import solve_banded
+import math
+import seaborn as sns
+sns.set_style("whitegrid")
 
-def psi(i,x, dx):
-    if x > (i+1)*dx or x < (i-1)*dx:
+
+def tridiagsolver(K,F):
+    ud = np.insert(np.diag(K,1), 0, 0)           # upper diagonal
+    d = np.diag(K)                               # main diagonal
+    ld = np.insert(np.diag(K,-1), len(F)-1, 0)   # lower diagonal
+    ab = np.matrix([ud, d, ld])                  # simplified matrix
+    a = solve_banded((1, 1), ab, F)
+    return a
+
+def psi(j,x, dx):
+    if x > (j+1)*dx or x < (j-1)*dx:
         return 0
-    elif x < i*dx:
-        return (x - (i-1)*dx)/dx
-    elif:
-        return ((i+1)*dx - x)/dx
-    
+    elif x < j*dx:
+        return (x - (j-1)*dx)/dx
+    else:
+        return ((j+1)*dx - x)/dx
 
 def galerkin1d(nx):
     x = np.linspace(0,1,nx)
     dx = 1.0/(nx-1)
-    K = (2/dx)*np.ones((nx,nx))
-    np.fill_diagonal(K,-1/dx)
-    F = (-1/dx)*(np.sin((x[1:-1])*(2*x[1:-1]) - x[:-2] -x[2:] -2) + np.sin(x[:-2]) + np.sin(x[2:]))
-    a = np.concatenate([[0], solve(K[1:-1,1:-1],F), [1]])
-    return a
-
-nx = 5
-x = np.linspace(0,1,nx)
-a = galerkin1d(nx)
-
-nxplot = 100
-phi_galerkin = np.zeros(nxplot)
-plot_x = np.linspace(0,1,nxplot)
-
-for i,xval in enumerate(plot_x):
-    lower = int(xval)
-    upper = int(xval)+1
-    if xval - lower >= 0.5:
-        phi_galerkin[i] = 
-        
+    K = np.zeros((nx,nx))                   # Stiffness matrix
+    for i in range(nx):
+        if i == 0:
+            K[i,i] = 1
+            K[i,i+1] = 0
+        elif i == len(K)-1:
+            K[i,i] = 1
+            K[i,i-1] = 0
+        else:
+            K[i,i] = 2/dx
+            K[i,i-1] = -1/dx
+            K[i,i+1] = -1/dx
+            
+    F = np.zeros(nx)                         # Load vector
+    F [0] = 0
+    F[1:-1] = (-1.0/dx)*(2*np.cos(x[1:-1]) - np.cos(x[0:-2]) - np.cos(x[2:]))
+    F[-1] = 1
     
-phi_galerkin = np.zeros(nx)
-
+    a = tridiagsolver(K,F)                   # Solve system
     
-phi_galerkin = x -
-basis = 
+    nxplot = 200                             # Recombine phi from basis functions
+    plot_x = np.linspace(0,1,nxplot)
+    phi_galerkin = np.zeros(nxplot)
+    for i in range(len(plot_x)):                    
+        for j in range(len(a)):
+            phi_galerkin[i] +=  a[j]*psi(j, plot_x[i], dx)
+    return phi_galerkin
 
-phi_analy = -np.cos(x) + (1+np.cos(1))*x +1
+if __name__ == "__main__":
+    plot_x = np.linspace(0,1,200)  # points for  plotting
+    phi_galerkin5 = galerkin1d(nx=5)
+    phi_galerkin9 = galerkin1d(nx=9)
+    phi_analy = -np.cos(plot_x) + np.cos(1)*plot_x + 1
 
-plt.plot(x,phi_analy)
-plt.show()
-    
+    plt.figure(1)
+    plt.plot(plot_x, phi_analy, label= "Analytical")
+    plt.plot(plot_x, phi_galerkin5, label="Galerkin FE")
+    plt.title("Galerkin FE 5 Nodes")
+    plt.ylabel("$\phi$")
+    plt.xlabel("x")
+    plt.legend()
+
+    plt.figure(2)
+    plt.plot(plot_x, phi_analy, label= "Analytical")
+    plt.plot(plot_x, phi_galerkin9, label="Galerkin FE")
+    plt.title("Galerkin FE 9 Nodes")
+    plt.ylabel("$\phi$")
+    plt.xlabel("x")
+    plt.legend()
+
+    plt.figure(3)
+    plt.plot(plot_x, np.abs(phi_analy-phi_galerkin5), label= "5 Node num-analytical error")
+    plt.plot(plot_x, np.abs(phi_analy-phi_galerkin9), label= "9 Node num-analytical error")
+    plt.title("Galerkin FE Error Compared to Analytic Solution")
+    plt.ylabel("Error")
+    plt.xlabel("x")
+    plt.legend()
+    plt.show()

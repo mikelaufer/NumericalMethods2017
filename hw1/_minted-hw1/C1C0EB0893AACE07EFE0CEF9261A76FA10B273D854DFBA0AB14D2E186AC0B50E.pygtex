@@ -1,0 +1,87 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k+kn}{as} \PYG{n+nn}{np}
+\PYG{k+kn}{import} \PYG{n+nn}{matplotlib.pyplot} \PYG{k+kn}{as} \PYG{n+nn}{plt}
+\PYG{k+kn}{from} \PYG{n+nn}{scipy.linalg} \PYG{k+kn}{import} \PYG{n}{solve\PYGZus{}banded}
+\PYG{k+kn}{import} \PYG{n+nn}{math}
+\PYG{k+kn}{import} \PYG{n+nn}{seaborn} \PYG{k+kn}{as} \PYG{n+nn}{sns}
+\PYG{n}{sns}\PYG{o}{.}\PYG{n}{set\PYGZus{}style}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}whitegrid\PYGZdq{}}\PYG{p}{)}
+
+
+\PYG{k}{def} \PYG{n+nf}{tridiagsolver}\PYG{p}{(}\PYG{n}{K}\PYG{p}{,}\PYG{n}{F}\PYG{p}{):}
+    \PYG{n}{ud} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{insert}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{diag}\PYG{p}{(}\PYG{n}{K}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{),} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{)}           \PYG{c+c1}{\PYGZsh{} upper diagonal}
+    \PYG{n}{d} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{diag}\PYG{p}{(}\PYG{n}{K}\PYG{p}{)}                               \PYG{c+c1}{\PYGZsh{} main diagonal}
+    \PYG{n}{ld} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{insert}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{diag}\PYG{p}{(}\PYG{n}{K}\PYG{p}{,}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{),} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{F}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{)}   \PYG{c+c1}{\PYGZsh{} lower diagonal}
+    \PYG{n}{ab} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{matrix}\PYG{p}{([}\PYG{n}{ud}\PYG{p}{,} \PYG{n}{d}\PYG{p}{,} \PYG{n}{ld}\PYG{p}{])}                  \PYG{c+c1}{\PYGZsh{} simplified matrix}
+    \PYG{n}{a} \PYG{o}{=} \PYG{n}{solve\PYGZus{}banded}\PYG{p}{((}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{),} \PYG{n}{ab}\PYG{p}{,} \PYG{n}{F}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{a}
+
+\PYG{k}{def} \PYG{n+nf}{psi}\PYG{p}{(}\PYG{n}{j}\PYG{p}{,}\PYG{n}{x}\PYG{p}{,} \PYG{n}{dx}\PYG{p}{):}
+    \PYG{k}{if} \PYG{n}{x} \PYG{o}{\PYGZgt{}} \PYG{p}{(}\PYG{n}{j}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{dx} \PYG{o+ow}{or} \PYG{n}{x} \PYG{o}{\PYGZlt{}} \PYG{p}{(}\PYG{n}{j}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{dx}\PYG{p}{:}
+	\PYG{k}{return} \PYG{l+m+mi}{0}
+    \PYG{k}{elif} \PYG{n}{x} \PYG{o}{\PYGZlt{}} \PYG{n}{j}\PYG{o}{*}\PYG{n}{dx}\PYG{p}{:}
+	\PYG{k}{return} \PYG{p}{(}\PYG{n}{x} \PYG{o}{\PYGZhy{}} \PYG{p}{(}\PYG{n}{j}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{dx}\PYG{p}{)}\PYG{o}{/}\PYG{n}{dx}
+    \PYG{k}{else}\PYG{p}{:}
+	\PYG{k}{return} \PYG{p}{((}\PYG{n}{j}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{dx} \PYG{o}{\PYGZhy{}} \PYG{n}{x}\PYG{p}{)}\PYG{o}{/}\PYG{n}{dx}
+
+\PYG{k}{def} \PYG{n+nf}{galerkin1d}\PYG{p}{(}\PYG{n}{nx}\PYG{p}{):}
+    \PYG{n}{x} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{n}{nx}\PYG{p}{)}
+    \PYG{n}{dx} \PYG{o}{=} \PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{p}{(}\PYG{n}{nx}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}
+    \PYG{n}{K} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{((}\PYG{n}{nx}\PYG{p}{,}\PYG{n}{nx}\PYG{p}{))}                   \PYG{c+c1}{\PYGZsh{} Stiffness matrix}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{nx}\PYG{p}{):}
+	\PYG{k}{if} \PYG{n}{i} \PYG{o}{==} \PYG{l+m+mi}{0}\PYG{p}{:}
+	    \PYG{n}{K}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{1}
+	    \PYG{n}{K}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{i}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+	\PYG{k}{elif} \PYG{n}{i} \PYG{o}{==} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{K}\PYG{p}{)}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{:}
+	    \PYG{n}{K}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{1}
+	    \PYG{n}{K}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{i}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+	\PYG{k}{else}\PYG{p}{:}
+	    \PYG{n}{K}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{i}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{2}\PYG{o}{/}\PYG{n}{dx}
+	    \PYG{n}{K}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{i}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{o}{/}\PYG{n}{dx}
+	    \PYG{n}{K}\PYG{p}{[}\PYG{n}{i}\PYG{p}{,}\PYG{n}{i}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{o}{/}\PYG{n}{dx}
+
+    \PYG{n}{F} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{nx}\PYG{p}{)}                         \PYG{c+c1}{\PYGZsh{} Load vector}
+    \PYG{n}{F} \PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{n}{F}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{=} \PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{l+m+mf}{1.0}\PYG{o}{/}\PYG{n}{dx}\PYG{p}{)}\PYG{o}{*}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{cos}\PYG{p}{(}\PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{])} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{cos}\PYG{p}{(}\PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{:}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{2}\PYG{p}{])} \PYG{o}{\PYGZhy{}} \PYG{n}{np}\PYG{o}{.}\PYG{n}{cos}\PYG{p}{(}\PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{:]))}
+    \PYG{n}{F}\PYG{p}{[}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{1}
+
+    \PYG{n}{a} \PYG{o}{=} \PYG{n}{tridiagsolver}\PYG{p}{(}\PYG{n}{K}\PYG{p}{,}\PYG{n}{F}\PYG{p}{)}                   \PYG{c+c1}{\PYGZsh{} Solve system}
+
+    \PYG{n}{nxplot} \PYG{o}{=} \PYG{l+m+mi}{200}                             \PYG{c+c1}{\PYGZsh{} Recombine phi from basis functions}
+    \PYG{n}{plot\PYGZus{}x} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{n}{nxplot}\PYG{p}{)}
+    \PYG{n}{phi\PYGZus{}galerkin} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{zeros}\PYG{p}{(}\PYG{n}{nxplot}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{plot\PYGZus{}x}\PYG{p}{)):}
+	\PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{a}\PYG{p}{)):}
+	    \PYG{n}{phi\PYGZus{}galerkin}\PYG{p}{[}\PYG{n}{i}\PYG{p}{]} \PYG{o}{+=}  \PYG{n}{a}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}\PYG{o}{*}\PYG{n}{psi}\PYG{p}{(}\PYG{n}{j}\PYG{p}{,} \PYG{n}{plot\PYGZus{}x}\PYG{p}{[}\PYG{n}{i}\PYG{p}{],} \PYG{n}{dx}\PYG{p}{)}
+    \PYG{k}{return} \PYG{n}{phi\PYGZus{}galerkin}
+
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZdq{}}\PYG{p}{:}
+    \PYG{n}{plot\PYGZus{}x} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{,}\PYG{l+m+mi}{200}\PYG{p}{)}
+    \PYG{n}{phi\PYGZus{}galerkin5} \PYG{o}{=} \PYG{n}{galerkin1d}\PYG{p}{(}\PYG{n}{nx}\PYG{o}{=}\PYG{l+m+mi}{5}\PYG{p}{)}
+    \PYG{n}{phi\PYGZus{}galerkin9} \PYG{o}{=} \PYG{n}{galerkin1d}\PYG{p}{(}\PYG{n}{nx}\PYG{o}{=}\PYG{l+m+mi}{9}\PYG{p}{)}
+    \PYG{n}{phi\PYGZus{}analy} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{n}{np}\PYG{o}{.}\PYG{n}{cos}\PYG{p}{(}\PYG{n}{plot\PYGZus{}x}\PYG{p}{)} \PYG{o}{+} \PYG{n}{np}\PYG{o}{.}\PYG{n}{cos}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{plot\PYGZus{}x} \PYG{o}{+} \PYG{l+m+mi}{1}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{plot\PYGZus{}x}\PYG{p}{,} \PYG{n}{phi\PYGZus{}analy}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}Analytical\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{plot\PYGZus{}x}\PYG{p}{,} \PYG{n}{phi\PYGZus{}galerkin5}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}Galerkin FE\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Galerkin FE 5 Nodes\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}\PYGZdl{}\PYGZbs{}phi\PYGZdl{}\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}x\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{plot\PYGZus{}x}\PYG{p}{,} \PYG{n}{phi\PYGZus{}analy}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}Analytical\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{plot\PYGZus{}x}\PYG{p}{,} \PYG{n}{phi\PYGZus{}galerkin9}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}Galerkin FE\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Galerkin FE 9 Nodes\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}\PYGZdl{}\PYGZbs{}phi\PYGZdl{}\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}x\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{plot\PYGZus{}x}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{phi\PYGZus{}analy}\PYG{o}{\PYGZhy{}}\PYG{n}{phi\PYGZus{}galerkin5}\PYG{p}{),} \PYG{n}{label}\PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}5 Node num\PYGZhy{}analytical error\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{plot\PYGZus{}x}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{phi\PYGZus{}analy}\PYG{o}{\PYGZhy{}}\PYG{n}{phi\PYGZus{}galerkin9}\PYG{p}{),} \PYG{n}{label}\PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}9 Node num\PYGZhy{}analytical error\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Galerkin FE Error Compared to Analytic Solution\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Error\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}x\PYGZdq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+\end{Verbatim}

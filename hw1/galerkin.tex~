@@ -1,0 +1,118 @@
+% Created 2017-11-04 Sat 23:40
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\usepackage{minted}
+\author{mike}
+\date{\today}
+\title{galerkin}
+\hypersetup{
+  pdfkeywords={},
+  pdfsubject={},
+  pdfcreator={Emacs 25.3.1 (Org mode 8.2.10)}}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.linalg import solve$_{\text{banded}}$
+import math
+import seaborn as sns
+sns.set$_{\text{style}}$("whitegrid")
+
+
+def tridiagsolver(K,F):
+    ud = np.insert(np.diag(K,1), 0, 0)           \# upper diagonal
+    d = np.diag(K)                               \# main diagonal
+    ld = np.insert(np.diag(K,-1), len(F)-1, 0)   \# lower diagonal
+    ab = np.matrix([ud, d, ld])                  \# simplified matrix
+    a = solve$_{\text{banded}}$((1, 1), ab, F)
+    return a
+
+def psi(j,x, dx):
+    if x > (j+1)*dx or x < (j-1)*dx:
+        return 0
+    elif x < j*dx:
+        return (x - (j-1)*dx)/dx
+    else:
+        return ((j+1)*dx - x)/dx
+
+def galerkin1d(nx):
+    x = np.linspace(0,1,nx)
+    dx = 1.0/(nx-1)
+    K = np.zeros((nx,nx))
+    for i in range(nx):
+        if i == 0:
+            K[i,i] = 1
+            K[i,i+1] = 0
+        elif i == len(K)-1:
+            K[i,i] = 1
+            K[i,i-1] = 0
+        else:
+            K[i,i] = 2/dx
+            K[i,i-1] = -1/dx
+            K[i,i+1] = -1/dx
+    print("K", K)
+    F = np.zeros(nx)
+    for i in range(nx):
+        if i == 0:
+            F[i] = 0 
+        elif i == nx - 1:
+            F[i] = 1
+        else:
+            F[i] = (-1.0/dx)*(2*np.cos(x[i]) - np.cos(x[i-1]) - np.cos(x[i+1]))
+    print("F",F)
+    a = tridiagsolver(K,F)
+    print(a)
+    nxplot = 200
+    plot$_{\text{x}}$ = np.linspace(0,1,nxplot)
+    phi$_{\text{galerkin}}$ = np.zeros(nxplot)
+    for i in range(len(plot$_{\text{x}}$)):
+        for j in range(len(a)):
+            phi$_{\text{galerkin[i]}}$ +=  a[j]*psi(j, plot$_{\text{x[i]}}$, dx)
+    fluxl = a\footnote{DEFINITION NOT FOUND.}*(1/dx) + 0
+    fluxr = a[-1]*(1/dx) + 0
+    return phi$_{\text{galerkin}}$
+
+if \uline{\uline{name}} == "\uline{\uline{main}}":
+    plot$_{\text{x}}$ = np.linspace(0,1,200)  \# points for  plotting
+    phi$_{\text{galerkin5}}$ = galerkin1d(nx=5)
+    phi$_{\text{galerkin9}}$ = galerkin1d(nx=9)
+    phi$_{\text{analy}}$ = -np.cos(plot$_{\text{x}}$) + np.cos(1)*plot$_{\text{x}}$ +1
+
+plt.figure(1)
+plt.plot(plot$_{\text{x}}$, phi$_{\text{analy}}$, label= "Analytical")
+plt.plot(plot$_{\text{x}}$, phi$_{\text{galerkin5}}$, label="Galerkin FE")
+plt.title("Galerkin FE 5 Nodes")
+plt.legend()
+
+plt.figure(2)
+plt.plot(plot$_{\text{x}}$, phi$_{\text{analy}}$, label= "Analytical")
+plt.plot(plot$_{\text{x}}$, phi$_{\text{galerkin9}}$, label="Galerkin FE")
+plt.title("Galerkin FE 9 Nodes")
+plt.legend()
+
+plt.figure(3)
+plt.plot(plot$_{\text{x}}$, np.abs(phi$_{\text{analy}}$-phi$_{\text{galerkin5}}$), label= "5 Node num-analytical error")
+plt.plot(plot$_{\text{x}}$, np.abs(phi$_{\text{analy}}$-phi$_{\text{galerkin9}}$), label= "9 Node num-analytical error")
+plt.title("Galerkin FE error compared to analytic")
+plt.legend()
+plt.show()
+% Emacs 25.3.1 (Org mode 8.2.10)
+\end{document}
