@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
-nx = 21
-ny = 21
+nx = 41
+ny = 41
 x = np.linspace(0, 1, nx)
 y = np.linspace(0, 1, ny)
 xx, yy = np.meshgrid(x, y, sparse=True)
@@ -65,6 +65,9 @@ for i in range(nx):
         k = (j-1)*nx + i - 1
         phi2d[j,i] = phi1d[k]
 
+
+error = np.abs(phi2d - phi_analytical)
+
 # ## 2D plot
 # plt.figure(1)
 # plt.contourf(x,y,phi2d)
@@ -78,25 +81,28 @@ for i in range(nx):
 #plt.title('FD solution')
 
 # # 3d plot
-fig = plt.figure(figsize=(11, 7), dpi=100)
-ax = fig.gca(projection='3d')
-ax.plot_surface(xx, yy, phi_analytical, cmap=cm.viridis, rstride=2, cstride=2)
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.set_zlabel('z')
-plt.title('Analytical solution')
+# fig = plt.figure(figsize=(11, 7), dpi=100)
+# ax = fig.gca(projection='3d')
+# ax.plot_surface(xx, yy, phi_analytical, cmap=cm.viridis, rstride=2, cstride=2)
+# ax.set_xlabel('x')
+# ax.set_ylabel('y')
+# ax.set_zlabel('z')
+# plt.title('Analytical solution')
+
+# fig = plt.figure(figsize=(11, 7), dpi=100)
+# ax = fig.gca(projection='3d')
+# ax.plot_surface(xx, yy, phi2d, cmap=cm.viridis, rstride=2, cstride=2)
+# ax.set_xlabel('x')
+# ax.set_ylabel('y')
+# ax.set_zlabel('z')
+# plt.title('FD solution')
+# plt.show()
+
+plt.figure(5)
+plt.contourf(x,y,error)
+plt.colorbar()
+plt.title('Absolute Error')
 
 
 
-fig = plt.figure(figsize=(11, 7), dpi=100)
-ax = fig.gca(projection='3d')
-ax.plot_surface(xx, yy, phi2d, cmap=cm.viridis, rstride=2, cstride=2)
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.set_zlabel('z')
-plt.title('FD solution')
 plt.show()
-
-
-
-#plt.show()
