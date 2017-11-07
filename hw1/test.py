@@ -52,6 +52,8 @@ def galerkin1d(nx):
     for i in range(len(plot_x)):
         for j in range(len(a)):
             phi_galerkin[i] +=  a[j]*psi(j, plot_x[i], dx)
+    fluxl = a[0]*(1/dx) + 0
+    fluxr = a[-1]*(1/dx) + 0
     return phi_galerkin
 
 if __name__ == "__main__":

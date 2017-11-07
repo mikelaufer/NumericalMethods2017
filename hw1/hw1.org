@@ -3,12 +3,12 @@
 \[
 \frac{\partial \phi}{\partial t} + \vec{U} \cdot \nabla \phi = 0
 \]
-There are no second order derivatives, therefore $b^{2} -4ac = 0$. The PDE is Parabolic.
+There are no second order derivatives, therefore $b^{2} -4ac = 0$	￼	￼. The PDE is parabolic.
 ** *b.*
 \[
 \frac{\partial \phi}{\partial t} + \vec{U} \cdot \nabla \phi = \Gamma \nabla^{2} \phi
 \]
-We can see that $ a=c=-\Gamma$ where $ \Gamma is a positive number. Therefore $b^{2} -4ac < 0$. The PDE is Elliptic.
+We can see that $ a=c=-\Gamma $ where $\Gamma$ is a positive number. Therefore $b^{2} -4ac < 0$. The PDE is elliptic.
 
 ** *c.*
 \[
@@ -16,22 +16,20 @@ We can see that $ a=c=-\Gamma$ where $ \Gamma is a positive number. Therefore $b
 \]
 Rearranging the equation:
 \[
- \Gamma_{1} \frac{\partial^{2} \phi}{\partial x^{2}} -\left(\Gamma_{1} + \Gamma_{2} \right) \frac{\partial^{2} \phi}{\partial x \partial y} + \Gamma_{1} \frac{\partial^{2} \phi^}{\partial y^{2}} = 0
+ \Gamma_{1} \frac{\partial^{2} \phi}{\partial x^{2}} - 2 \Gamma_{2}  \frac{\partial^{2} \phi}{\partial x \partial y} + \Gamma_{1} \frac{\partial^{2} \phi^}{\partial y^{2}} = 0
 \]
 $\Gamma_{1}$ and $\Gamma_{2}$ can be either positive or negative.
 Splitting into different cases:
 + If $\Gamma_{1} > \Gamma_{2}$: $b^{2} -4ac > 0$ and the PDE is hyperbolic
 + If $\Gamma_{1} < \Gamma_{2}$: $b^{2} -4ac < 0$ and the PDE is elliptic
 + If $\Gamma_{1} = \Gamma_{2}$: $b^{2} -4ac = 0$ and the PDE is parabolic.
-
-
 ** *d.*
 \[
 \frac{\partial \phi}{\partial t} - \frac{1}{r}\frac{\partial}{\partial r}\left( r \frac{\phi}{\partial r} \right) = 0
 \]
 Rearranging the equation:
 \[
-\frac{\partial \phi}{\partial t} - \frac{1}{r}\frac{\partial \phi}{\partial r} - \frac{\partial^{2 \phi}}{\partial r^{2}} = 0
+\frac{\partial \phi}{\partial t} - \frac{1}{r}\frac{\partial \phi}{\partial r} - \frac{\partial^{2} \phi}{\partial r^{2}} = 0
 \]
 $b^{2} -4ac = 0$. The PDE is parabolic.
 
@@ -45,12 +43,21 @@ Rearranging yields,
 \]
 In regards to space, the PDE is clearly elliptic as only a single second order spatial derivative exists. In regards to a time-space point of view, given $\Gamma > 0$,  $b^{2} -4ac > 0$. The PDE is hyperbolic.
 \newpage
+
 * 1.2 Galerkin FE method
+Given: 
+\[
+\frac{\partial^{2} \phi}{\partial x^{2}} = \cos x
+\]
+With the boundary conditions:
+\[
+ \phi \left( 0 \right) = 0, \phi \left( 1 \right) = 1, 
+\]
 The analytical solution is found by integrating twice with respect to $\phi$ and plugging in the provided boundary conditions, resulting in:
 \[
 \phi(x) = -\cos(x) +  \cos(1) x +1
 \]
-To solve this equation using the Galerking Finite Element method we will follow the same procedure as Example 1.1, and choose the same top-hat linear base functions but with a different right hand side.\\
+To solve this equation using the Galerkin Finite Element method we will follow the same procedure as Example 1.1, and choose the same top-hat linear base functions but with a different right hand side.\\
 Using the same basis function gives us the same interior tradiagonal stiffness values: \\ 
 if $i=j$, $K_{j,i} = 2 / \Delta x$ \\
 if $i = j+1$ or $i = j-1$, $K_{j,i} = -1 / \Delta x$ \\
@@ -102,8 +109,7 @@ A plot of the numerical solution plotted against the analytical solution can be 
 
 #+ATTR_LATEX: :width 12cm
 [[./figures/9nodes.png]]
-
-We can see that even for 5 nodes, an accurate solution is obtained.
+It is clear that even for just 5 nodes, an accurate solution is obtained, although the 9 node case gives better
 Additionally a plot of the error throughout the domain can be plotted.
 
 #+ATTR_LATEX: :width 12cm
@@ -120,25 +126,25 @@ J_{L} = \frac{\partial \phi}{\partial x} (0) = a_{1} \frac{-1}{dx} + a_{2} \frac
 J_{R} = \frac{\partial \phi}{\partial x} (1) = a_{n} \frac{1}{dx} + a_{n-1} \frac{-1}{dx} 
 \]
 
-Lastly the numerical net source in the domain by integration is computed by integrating our initial equaiton from 0 to 1:
+Lastly the net source in the domain by integration is computed by integrating the source term analytically from 0 to 1:
 \[
-S = \int_{0}^{1} \frac{\partial^{2} \phi }{\partial x^{2}} = \frac{\partial \phi}{\partial x}(1) -  \frac{\partial \phi}{\partial x}(0)  =  J_{R} -J_{L}
+S = \int_{0}^{1} \cos x
 \] 
 
-Numerical results are compared with anylytical results in the following table:\\
+Numerical results are compared with analytical results in the following table:\\
 
 #+attr_latex: :align |c|c|c|c|
 |--------------------+--------------+------------------------+-----------------------|
-|                    | *Analytical* | *Galerking FE 5 Nodes* | *Galerkin FE 9 Nodes* |
+|                    | *Analytical* | *Galerkin FE 5 Nodes* | *Galerkin FE 9 Nodes* |
 |--------------------+--------------+------------------------+-----------------------|
 | $J_{L}$            |       0.5403 |                0.66464 |               0.60272 |
 | $J_{R}$            |       1.3817 |                 1.3058 |                1.3458 |
-| $S$                |       0.8414 |                0.64116 |               0.74308 |
-| $I= J_{R}-J_{L}-S$ |            0 |                 -0.202 |                -0.0983 |
+| $S$                |       0.8414 |                      - |                     - |
+| $I= J_{R}-J_{L}-S$ |            0 |                 -0.202 |               -0.0983 |
 |--------------------+--------------+------------------------+-----------------------|
 It is clear that as more nodes are added, the solution better converges to the analytical solution.
-We can observe that $I \neq 0$ for the numerical cases, suggesting that local conservation is not satisfied.    
-
+We can observe that $I \neq 0$ for the numerical cases, indicating that the local conservation is not satisfied.    
+This is a clear  disadvantage of the Galerkin FE method compared to Finite Volume methods that in general satisfy conservation.
 
 \newpage
 ** Appendix: Python Code
@@ -223,7 +229,7 @@ if __name__ == "__main__":
     plt.figure(3)
     plt.plot(plot_x, np.abs(phi_analy-phi_galerkin5), label= "5 Node num-analytical error")
     plt.plot(plot_x, np.abs(phi_analy-phi_galerkin9), label= "9 Node num-analytical error")
-    plt.title("Galerkin FE Error Compared to Analytic Solution")
+    plt.title("Galerkin FE Error Compared to Analytical Solution")
     plt.ylabel("Error")
     plt.xlabel("x")
     plt.legend()
