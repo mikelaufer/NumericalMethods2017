@@ -1,4 +1,4 @@
-% Created 2017-11-07 Tue 07:42
+% Created 2017-11-09 Thu 21:25
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -92,9 +92,6 @@ With the boundary conditions:
 \[
  \phi \left( 0 \right) = 0, \phi \left( 1 \right) = 1, 
 \]
-
-
-
 The analytical solution is found by integrating twice with respect to $\phi$ and plugging in the provided boundary conditions, resulting in:
 \[
 \phi(x) = -\cos(x) +  \cos(1) x +1
@@ -149,8 +146,7 @@ A plot of the numerical solution plotted against the analytical solution can be 
 \includegraphics[width=12cm]{./figures/5nodes.png}
 
 \includegraphics[width=12cm]{./figures/9nodes.png}
-
-We can see that even for 5 nodes, an accurate solution is obtained.
+It is clear that even for just 5 nodes, an accurate solution is obtained, although the 9 node case gives better
 Additionally a plot of the error throughout the domain can be plotted.
 
 \includegraphics[width=12cm]{./figures/error.png}

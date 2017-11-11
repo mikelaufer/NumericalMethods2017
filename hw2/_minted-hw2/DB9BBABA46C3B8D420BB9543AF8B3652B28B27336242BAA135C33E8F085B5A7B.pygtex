@@ -1,0 +1,7 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{i} \PYG{o}{=} \PYG{l+m+mi}{0}
+\PYG{k}{for} \PYG{n}{j} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{ny}\PYG{p}{):}
+    \PYG{n}{k} \PYG{o}{=} \PYG{p}{(}\PYG{n}{j}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{*}\PYG{n}{nx} \PYG{o}{+} \PYG{n}{i} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}
+    \PYG{n}{A}\PYG{p}{[}\PYG{n}{k}\PYG{p}{,}\PYG{n}{k}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mi}{1}
+    \PYG{n}{Q}\PYG{p}{[}\PYG{n}{k}\PYG{p}{]}  \PYG{o}{=} \PYG{n}{phi\PYGZus{}left}\PYG{p}{[}\PYG{n}{j}\PYG{p}{]}
+\end{Verbatim}

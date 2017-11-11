@@ -1,0 +1,13 @@
+* Finite Difference - Poisson Equation
+Given the Poisson equation:
+\[
+\frac{\partial^{2} \phi}{\partial x^{2}} + \frac{\partjumbledial^{2} \phi}{\pjumbledartial y^{2}} = S_{\phi}
+\]
+
+Testing
+
+#+BEGIN_SRC python
+  for i in range(10):
+      print(i)
+
+#+END_SRC

@@ -1,0 +1,95 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/mike/NumericalMethods2017/hw2/hw2.org
+
+
+* Finite Difference - Poisson Equation
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2017-11-11 Sat 20:21
+  :ARCHIVE_FILE: ~/NumericalMethods2017/hw2/hw2.org
+  :ARCHIVE_CATEGORY: hw2
+  :END:
+Given the Poisson equation:
+\[
+\frac{\partial^{2} \phi}{\partial x^{2}} + \frac{\partial^{2} \phi}{\partial y^{2}} = S_{\phi}
+\]
+
+\[
+S_{\phi}=50000 \exp \left[ \left( 1 - x \right)^{2} y^{2} \right] } \left[ 100 \left( \left( 1-x^{2}  \right)  + y^{2} \right) -2 \right]
+\]
+
+With Derichlet boundary conditions given as functions defined on the square domain boundary. \\
+The system has an analytical solution given by:
+\[
+\phi \left( x,y \right) = 500 e^{-50 \left[ \left(1-x \right)^{2} + y^{2}\right] } + 100x \left( 1-y \right)
+\]
+
+We will discretize the second order spatial derivatives with a 2nd order central differencing stencil which will lead to a 5 point stencil. The choice of using a central differencing stencil is appropriate as the Poisson equation is essentially an isotropic diffusion. In this fashion, the symmetric central differencing scheme matches the underlying physical phenomenon. 
+
+\[
+\frac{\partial^{2} \phi}{\partial x^{2}} = \frac{\phi_{i+1,j} + \phi_{i-1,j} -2\phi_{i,j} }{\left(\Delta x \right)^{2}}
+\]
+
+\[
+\frac{\partial^{2} \phi}{\partial y^{2}} = \frac{\phi_{i,j+1} + \phi_{i,j-1} -2\phi_{i,j} }{\left(\Delta y \right)^{2}}
+\]
+
+\[
+\frac{\partial^{2} \phi}{\partial x^{2}} + \frac{\partial^{2} \phi}{\partial y^{2}}  = \frac{\phi_{i+1,j} + \phi_{i-1,j} -2\phi_{i,j} }{\left(\Delta x \right)^{2}} + \frac{\phi_{i,j+1} + \phi_{i,j-1} -2\phi_{i,j} }{\left(\Delta y \right)^{2}} = S_{\phi} 
+\]
+This equation  shows the linear dependence of each node on its north, south, east, and west neighbors. 
+This equation is then rearranged for each of the nodes into a full rank $nx$ X $ny$ matrix equation.
+
+The following Numpy code snippet builds the coefficient matrix and RHS vector for the interior nodes. It follows Mazumder's derivation, but takes into account the slightly different Python array indexing: \\
+
+*Numpy - Coef. Matrix, RHS Vector:* 
+#+BEGIN_SRC python
+A = np.zeros((nx*ny, nx*ny), dtype=float)     # Coef. Matrix
+Q = np.zeros(nx*ny, dtype=float)              # RHS vector
+dx = 1.0/(nx - 1)
+dy = 1.0/(ny - 1)
+dx2 = dx*dx
+dy2 = dy*dy
+
+for i in range(1, nx-1):
+    for j in range(1, ny-1):
+        k = (j-1)*nx + i -1                  # Running Index
+        A[k,k] = -(2.0/dx2 + 2.0/dy2)
+        A[k, k-1] = 1/dx2
+        A[k, k+1] = 1/dx2
+        A[k, k-nx] = 1/dy2
+        A[k, k+nx] = 1/dy2
+        Q[k] = S[j,i]
+#+END_SRC
+
+The boundary nodes are dealt with in a similar manner. For example, for the left boundary of our domain:  \\
+
+*Numpy - Left Boundary Example:* 
+#+BEGIN_SRC python
+i = 0                                      # Index for left boundary
+for j in range(ny):
+    k = (j-1)*nx + i -1
+    A[k,k] = 1
+    Q[k]  = phi_left[j]
+#+END_SRC
+
+The corresponding matrix equation is solved using the built-in Numpy linear algebra solver. 
+The system was solved for both $nx=ny=21$ and $nx=ny=41$, and the absolute error between the numerical solution and the analytical solution is plotted in the domain..
+
+#+ATTR_LATEX: :width 15cm 
+[[./figures/21node.png]]
+
+\\
+We can see a maximum error of less than 1% compared to the anlaytical solution. 
+
+#+ATTR_LATEX: :width 15cm 
+[[./figures/41node.png]]
+
+The 41x41 node solution shows a smoother contour plot, along with a substantially lower maximum error. We can see the same region with the maximal errors, which seems to correlate to the region of highest spatial gradients. The magnitude of the gradient in that region is clearly observed in the following surface plot solved with 101x101 nodes.
+ 
+# #+CAPTION: 3D Surface Plot 101x101 nodes. 
+#+ATTR_LATEX: :width 15cm 
+[[./figures/3d.png]]
+
+\newpage

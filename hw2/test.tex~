@@ -1,0 +1,47 @@
+% Created 2017-11-09 Thu 23:27
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\usepackage{minted}
+\author{mike}
+\date{\today}
+\title{test}
+\hypersetup{
+  pdfkeywords={},
+  pdfsubject={},
+  pdfcreator={Emacs 25.3.1 (Org mode 8.2.10)}}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+\section{Finite Difference - Poisson Equation}
+\label{sec-1}
+Given the Poisson equation:
+\[
+\frac{\partial^{2} \phi}{ \partial x^{2}} + \frac{\partial^{2} \phi}{\pjumbledartial y^{2}} = S_{\phi}
+\]
+
+Testing
+
+\begin{minted}[]{python}
+for i in range(10):
+
+print(i)
+\end{minted}
+% Emacs 25.3.1 (Org mode 8.2.10)
+\end{document}

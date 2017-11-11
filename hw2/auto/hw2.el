@@ -1,5 +1,5 @@
 (TeX-add-style-hook
- "hw1"
+ "hw2"
  (lambda ()
    (TeX-add-to-alist 'LaTeX-provided-class-options
                      '(("article" "11pt")))
@@ -36,12 +36,6 @@
     "minted")
    (LaTeX-add-labels
     "sec-1"
-    "sec-1-1"
-    "sec-1-2"
-    "sec-1-3"
-    "sec-1-4"
-    "sec-1-5"
-    "sec-2"
-    "sec-2-1"))
+    "sec-2"))
  :latex)
 
