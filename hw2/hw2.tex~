@@ -80,6 +80,7 @@ for i in range(1, nx-1):
 	Q[k] = S[j,i]
 \end{minted}
 The boundary nodes are dealt with in a similar manner. For example, for the left boundary of our domain:  \\
+
 \textbf{Numpy - Left Boundary Example:} 
 \begin{minted}[]{python}
 i = 0                                      # Index for left boundary
