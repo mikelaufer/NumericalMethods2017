@@ -1,0 +1,11 @@
+* Finite Difference - Poisson Equation
+Given the Poisson equation:
+\[
+\frac{\partial^{2} \phi}{\partial x^{2}} + \frac{\partial^{2} \phi}{\partial y^{2}} = S_{\phi}
+\]
+Where $S_{\phi}$ is defined as:
+\[
+S_{\phi}=50000 e^{ -50 \left[ \left( 1 - x \right)^{2}  + y^{2} \right] } \cdot \left[ 100 \left( \left( 1-x^{2}  \right)  + y^{2} \right) -2 \right]
+\]
+* Appendix: Python Code
+  
