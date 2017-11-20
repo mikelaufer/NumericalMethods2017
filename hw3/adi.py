@@ -5,8 +5,6 @@ from scipy.linalg import *
 from numba import jit, prange
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-#import seaborn as sns
-#sns.set_style("whitegrid")
 
 @jit
 def trirowstepper(phi, S, phi_left, phi_right, phi_bottom, phi_top, dx2, dy2):
@@ -192,10 +190,6 @@ def pentrowstepper(phi, S, phi_left, phi_right, phi_bottom, phi_top, dx2, dy2):
                     e[i-2] = -(1.0/(12.0*dx2))
                     Q[i] =  S[j,i] + (1.0/(12.0*dy2))*(phin[j+2,i] -4*phin[j+1,i] -4*phi[j-1,i] \
                             +phi[j-2,i]) -(1/dy2)*(phin[j+1,i] +phi[j-1,i])
-
-            #print(d)
-            #print(c)
-            #print(f)
             phi[j,:] = pentadiag(d, f, c, a, e, Q)
     return phi
 
@@ -450,7 +444,4 @@ if __name__ == "__main__":
     ax.set_ylabel('y')
     ax.set_zlabel('z')
     plt.title('4th Order FD - Tri-diag')
-
-    
-
     plt.show()

@@ -1,0 +1,46 @@
+* testing
+Given the Poisson equation:
+\[
+\frac{\partial^{2} \phi}{\partial x^{2}} + \frac{\partial^{2} \phi}{\partial y^{2}} = S_{\phi}
+\]
+Where $S_{\phi}$ is defined as:
+\[
+S_{\phi}=50000 e^{ -50 \left[ \left( 1 - x \right)^{2}  + y^{2} \right] } \cdot \left[ 100 \left( \left( 1-x^{2}  \right)  + y^{2} \right) -2 \right]
+\]
+Derichlet boundary conditions are given as functions defined on the square domain boundary. \\
+The system has an analytical solution given by:
+\[
+\phi \left( x,y \right) = \left( x - \frac{1}{2} \right)^{2} \sinh \left[10 \left( x - \frac{1}{2} \right) \right] + \left( y - \frac{1}{2} \right)^{2} \sinh \left[10 \left( y - \frac{1}{2} \right) \right] + exp(2xy) 
+\]
+
+The problem will be solved using a 4th order central differencing scheme with both a tridiagonal and pentadiagonal alternating direction implcit scheme (ADI).
+
+The ADI scheme can be summarized as follows:
+ - Guess initial value for $\phi$
+ - set up a tridiagonal/pentagdiagonal matrix system for each line and column separately. 4th order for internal nodes, 2nd order at boundary nodes.
+ - Solve for each row and update that row in $\phi$ accordngly.
+ - Compute l2norm and check for convergence.
+ - Solve for each row and update that row in $\phi$ accordngly.
+ - Compute l2norm and check for convergence.
+ - Continue iterating until convergence is acheived.
+ 
+The internal nodal equations are discretized by a 4th order central-differencing 9 point stencil. Treating any node beyond the three central diagonals explicitly leads to the following row-wise sweep iterartive scheme (left side - implicit, right side - explicit):
+\[
+$ - \left( \frac{5}{2 \left( \Delta x \right) ^{2}} + \frac{5}{2 \left( \Delta y \right) ^{2}} \right) \phi_{i,j} + \frac{4}{3 \left( \Delta x \right)^{2}} \phi_{i+1,j} + \frac{4}{3 \left( \Delta x \right)^{2}} \phi_{i-1,j} \\ = S_{i,j} + \frac{1}{12} \left( \frac{\phi_{i,j+2} -4 phi_{i,j+1} -4 \phi_{i,j-1} + \phi_{i,j-2} }{\left( \Delta x \right)^{2} \right) - \frac{\phi_{i,j+1} \phi_{i,j-1}}{(\Delta y )^{2}}} \\ + \frac{1}{12} \left( \frac{\phi_{i+2,j} + \phi_{i-2,j}}{( \Delta x) ^{2}} \right)
+\] 
+
+Treating any node beyond the five central diagonals explicitly leads to the following row-wise sweep iterative scheme:
+
+\[
+$ - \left( \frac{5}{2 \left( \Delta x \right) ^{2}} + \frac{5}{2 \left( \Delta y \right) ^{2}} \right) \phi_{i,j} + \frac{4}{3 \left( \Delta x \right)^{2}} \phi_{i+1,j} + \frac{4}{3 \left( \Delta x \right)^{2}} \phi_{i-1,j} - \frac{1}{12 ( \Delta x ) ^{2}} \phi_{i+2,j} - \frac{1}{12 ( \Delta x ) ^{2}} \phi_{i-2,j}  = \\ S_{i,j} + \frac{1}{12} \left( \frac{\phi_{i,j+2} -4 phi_{i,j+1} -4 \phi_{i,j-1} + \phi_{i,j-2} }{\left( \Delta x \right)^{2} \right) - \frac{\phi_{i,j+1} \phi_{i,j-1}}{(\Delta y )^{2}}} 
+\] 
+
+
+* Org and Latex config :noexport:
+#+title: HW3 Numerical Methods Fall 2017
+#+AUTHOR: Michael Laufer
+# Don't make a title page
+#+OPTIONS: toc:nil
+#+BIND: org-export-latex-t
+#+latex_header: \input {preamble.tex}
+  

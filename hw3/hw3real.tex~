@@ -1,0 +1,149 @@
+% Created 2017-11-20 Mon 22:54
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\usepackage{minted}
+\input {preamble.tex}
+\author{Michael Laufer}
+\date{\today}
+\title{HW3 Numerical Methods Fall 2017}
+\hypersetup{
+  pdfkeywords={},
+  pdfsubject={},
+  pdfcreator={Emacs 25.3.1 (Org mode 8.2.10)}}
+\begin{document}
+
+\maketitle
+\section{ADI Iterative Scheme - 4th Order Poisson}
+\label{sec-1}
+\subsection{Problem}
+\label{sec-1-1}
+Given the Poisson equation:
+\[
+\frac{\partial^{2} \phi}{\partial x^{2}} + \frac{\partial^{2} \phi}{\partial y^{2}} = S_{\phi}
+\]
+Where $S_{\phi}$ is defined as:
+\[
+S_{\phi} = 2\sinh { 10 (x- \frac{1}{2})] + 40(x-\frac{1}{2}) \cosh [ 10 ( x - \frac{1}{2})^{2} )]+
+\]
+\[
+100 ( x - \frac{1}{2} )^{2} \sinh [10 ( x- \frac{1}{2} ) ] + 2\sinh { 10 (x- \frac{1}{2})] +
+\]
+\[
+40(x-\frac{1}{2}) \cosh [ 10 ( x - \frac{1}{2})^{2} )]+ 100 ( x - \frac{1}{2} )^{2} \sinh [10 ( x- \frac{1}{2} )]+
+\]
+\[
+4( x^{2} + y^{2}) exp(2xy)
+\]
+Derichlet boundary conditions are given as functions defined on the unit square domain boundary. \\
+The system has an analytical solution given by:
+\[
+\phi \left( x,y \right) = \left( x - \frac{1}{2} \right)^{2} \sinh \left[10 \left( x - \frac{1}{2} \right) \right] + \left( y - \frac{1}{2} \right)^{2} \sinh \left[10 \left( y - \frac{1}{2} \right) \right] + exp(2xy) 
+\]
+
+\subsection{Solution Methodology}
+\label{sec-1-2}
+The problem will be solved using a 4th order central differencing scheme with both a tridiagonal and pentadiagonal alternating direction implcit scheme (ADI).
+
+The ADI scheme can be summarized as follows:
+\begin{itemize}
+\item Guess initial value for $\phi$
+\item Set up a tridiagonal/pentagdiagonal matrix system for each line and column separately. 4th order for internal nodes, 2nd order at boundary nodes.
+\item Solve for each row and update that row in $\phi$ accordngly.
+\item Compute l2Norm and check for convergence.
+\item Solve for each row and update that row in $\phi$ accordngly.
+\item Compute l2Norm and check for convergence.
+\item Continue iterating until convergence is acheived.
+\end{itemize}
+
+The internal nodal equations are discretized by a 4th order central-differencing 9 point stencil. Treating any node beyond the three central diagonals explicitly leads to the following row-wise sweep iterartive scheme (left side - implicit, right side - explicit):
+
+\[
+-\left( \frac{5}{2 \left( \Delta x \right) ^{2}} + \frac{5}{2 \left( \Delta y \right) ^{2}} \right) \phi_{i,j} + \frac{4}{3 \left( \Delta x \right)^{2}} \phi_{i+1,j} + \frac{4}{3 \left( \Delta x \right)^{2}} \phi_{i-1,j} = 
+\]
+\[
+S_{i,j} + \frac{1}{12} \left( \frac{\phi_{i,j+2} -4 \phi_{i,j+1} -4 \phi_{i,j-1} + \phi_{i,j-2} }{\left( \Delta x \right)^{2} \right) - \frac{\phi_{i,j+1} + \phi_{i,j-1}}{(\Delta y )^{2}}} \\ + \frac{1}{12} \left( \frac{\phi_{i+2,j} + \phi_{i-2,j}}{( \Delta x) ^{2}} \right)
+\] 
+
+Treating any node beyond the five central diagonals explicitly leads to the following row-wise sweep iterative scheme:
+
+\[
+-\left( \frac{5}{2 \left( \Delta x \right) ^{2}} + \frac{5}{2 \left( \Delta y \right) ^{2}} \right) \phi_{i,j} + \frac{4}{3 \left( \Delta x \right)^{2}} \phi_{i+1,j} + \frac{4}{3 \left( \Delta x \right)^{2}} \phi_{i-1,j} - \frac{1}{12 ( \Delta x ) ^{2}} \phi_{i+2,j}
+\]
+\[
+-\frac{1}{12 ( \Delta x ) ^{2}} \phi_{i-2,j}  = \\ S_{i,j} + \frac{1}{12} \left( \frac{\phi_{i,j+2} -4 \phi_{i,j+1} -4 \phi_{i,j-1} + \phi_{i,j-2} }{\left( \Delta x \right)^{2} \right) - \frac{\phi_{i,j+1} + \phi_{i,j-1}}{(\Delta y )^{2}}} 
+\] 
+Nearly identical schemes can be formulated for column-wise sweeps by just replacing the $i$ indices with the $j$ indices. 
+
+Both of these schemes indicate that for a given node, information from non-adjacent nodes is needed, or more explicitly, information is needed from nodes 2 cell-distances away. Therefore, the 4th order scheme may not be used for nodes that are one node from the boundary. Hence, a 2nd order central differencing scheme is used for the near-boundary nodes. The following 2nd order row-wise sweep iterative scheme is employed (left side - implicit, right side - explicit):
+
+\[
+-\left( \frac{2}{ \left( \Delta x \right) ^{2}} + \frac{2}{ \left( \Delta y \right) ^{2}} \right) \phi_{i,j} + \frac{1}{ ( \Delta x )^{2} } \phi_{i+1,j} + \frac{1}{ ( \Delta x )^{2} } \phi_{i-1,j} =
+\]
+\[
+S_{i,j} - \frac{1}{ ( \Delta y )^{2} } \phi_{i,j+1} - \frac{1}{ ( \Delta x )^{2} } \phi_{i,j-1} 
+\]
+
+\subsection{Convergence Criterion}
+\label{sec-1-3}
+Convergence is monitored with the use of the $L^{2}Norm$ defined as:
+\[
+R2 = \sqrt{ \sum_{k=1}^{K} ( R_{k})^{2} }
+\]
+where:
+\[
+R_{k} = a_{k} \phi_{k}^{\prime} + \sum_{j=1 \\ j \neq k}^{N_{nb,k}}  a_{j} \phi_{j}^{\prime}  
+\]
+
+For a 4th order scheme this computation involves iterating over every node and accessing 8 neighboring nodes. A better approach is to use vectorized code, and notice that matrix addition can be used to replace the expensive double for loop. This is illustrated in the following python snippet.
+\begin{minted}[]{python}
+def l2norm(phi_prime, dx2, dy2):
+   ny, nx = phi_prime.shape
+   Rk = phi_prime[2:-2,2:-2]*(-(5.0/(2.0*dx2) + 5.0/(2.0*dy2))) + phi_prime[2:-2,3:-1]*(4.0/(3.0*dx2)) \
+	+ phi_prime[2:-2,1:-3]*(4.0/(3.0*dx2)) + phi_prime[3:-1,2:-2]*(4.0/(3.0*dy2)) \
+	+ phi_prime[1:-3,2:-2]*(4.0/(3.0*dy2)) + phi_prime[2:-2,4:]*(-1.0/(12*dx2)) + \
+	phi_prime[2:-2,:-4]*(-1.0/(12*dx2)) + phi_prime[4:,2:-2]*(-1.0/(12*dy2)) \
+	+ phi_prime[:-4,2:-2]*(-1.0/(12*dy2))
+   Rksquared = np.multiply(Rk,Rk)
+   return math.sqrt(Rksquared.sum())
+\end{minted}
+
+\subsection{Numba}
+\label{sec-1-4}
+Python, being a dynamically typed language is a few orders of magnitude slower than statically typed languages such as C and Fortran for expression-by-expression computations. In this problem, we employ a tridiagonal, and pentadiagonal which reduce the order of operations considerably compared to a full linear system solver, but due to the fact that Numpy utilizes fast statically typed routines in the backend, the speed up is less apparent.  
+
+Enter Numba. Numbe generates optimized machine code using the LLVM compiler at runtime, which provides similar performance to C, C++ and Fortran without having to change (much) code. Numpy was utilized extensively throughout this assignment, leading to tremendous performance gains over straight Python, as will be discussed later. This allows the direct solvers implemented to really shine even compared to library solvers.
+
+\subsection{Results}
+\label{sec-1-5}
+Both solutions were solved till $l^{2}Norm$ fell below 10e-8.
+Solution, and error contour plots are plotted for both the tridiagonal, and pentadiagonal 4th order ADI solver.
+
+\includegraphics[width=12cm]{./figures/tridiag.png}
+
+\includegraphics[width=12cm]{./figures/penta.png}
+
+We can see that the maximal error is below 0.002 throughout the domain for both solvers. In fact, due to the convergence criterion being so tight, no perceivable difference can be seen between the contour plots of both solvers.
+A satisfying 3d plot is shown, to show the geomtrical complexity of the given problem.
+
+\includegraphics[width=12cm]{./figures/3d.png}
+
+The residual was computed at each iteration and is plotted over the course of the computation.
+
+\includegraphics[width=12cm]{./figures/residual.png}
+% Emacs 25.3.1 (Org mode 8.2.10)
+\end{document}
