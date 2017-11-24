@@ -29,7 +29,7 @@ def l2normMSD(phi, S, dx2, dy2):
     R2sum = Rksquared.sum()
     norm = (math.sqrt(Rksquared.sum()))
     return (R2sum, Rk, norm)
-
+@jit
 def jacobistep(phi,S, dx2, dx):
     phin = phi.copy()
     phi[1:-1,1:-1] = (S[1:-1,1:-1] - (1/dy2)*phin[0:-2,1:-1] - (1/dy2)*phin[2:,1:-1] - (1/dx2)*phin[1:-1,0:-2] - (1/dx2)*phin[1:-1,2:])/(-((2/dx2) + (2/dy2)))
@@ -57,6 +57,7 @@ def MSDstep(phi, S, R, R2sum, dx2, dy2):
     alpha = R2sum/rtc
     return( phin + alpha*R)
 
+@jit
 def CGstep(phi, S, R, R2sum, D, dx2, dy2):
     nx,ny = phi.shape
     phin = phi.copy()
@@ -71,6 +72,22 @@ def CGstep(phi, S, R, R2sum, D, dx2, dy2):
     beta = (R2sum2)/(R2sum)
     D = Rk2 + beta*D
     return(phin, D)
+
+def CGSstep(phi, S, R, R2sum, Rzero, D, Dstar, dx2, dy2):
+    nx,ny = phi.shape
+    phin = phi.copy()
+    c = np.zeros((ny,nx))
+
+    c[1:-1,1:-1] = -((2/dx2) + (2/dy2))*D[1:-1,1:-1] + (1/dx2)*D[1:-1,2:] + (1/dx2)*D[1:-1,0:-2]  + (1/dy2)*D[2:,1:-1] + (1/dy2)*D[0:-2,1:-1]
+    rtc = np.sum(np.multiply(Rzero, c))
+    alpha = np.sum(np.multiply(Rzero,R))/rtc
+    G = Dstar -alpha*c
+    phin = phin + alpha*(Dstar+G)
+    R2sum2, Rk2, R22 = l2normMSD(phin, S, dx2, dy2)
+    beta = np.sum(np.multiply(Rzero,Rk2))/np.sum(np.multiply(Rzero,R))
+    Dstar = Rk2 + beta*G
+    D = Dstar + beta*(G + beta*D)
+    return(phin, D, Dstar)
 
 
 if __name__ == "__main__":
@@ -104,7 +121,7 @@ if __name__ == "__main__":
     phistart = phi.copy()
 
 
-    # Jacobisolve
+    # Jacobi solve
     phiold = phi.copy()
     l2norm_phi = np.zeros(maxiters)
     for iteration in range(maxiters):
@@ -128,7 +145,7 @@ if __name__ == "__main__":
     phi_gauss = phi.copy()
     l2norm_gauss = l2norm_phi.copy()
 
-    # MSD
+    # MSD solve
     phi = np.copy(phistart)
     phiold = np.copy(phistart)
     l2norm_phi = np.zeros(maxiters)
@@ -141,7 +158,7 @@ if __name__ == "__main__":
     phi_MSD = phi.copy()
     l2norm_MSD = l2norm_phi.copy()
 
-    # CG
+    # CG solve
     phi = np.copy(phistart)
     phiold = np.copy(phistart)
     l2norm_phi = np.zeros(maxiters)
@@ -154,16 +171,35 @@ if __name__ == "__main__":
             break
     phi_CG = phi.copy()
     l2norm_CG = l2norm_phi.copy()
+
+    # # CGS solve
+    phi = np.copy(phistart)
+    phiold = np.copy(phistart)
+    l2norm_phi = np.zeros(maxiters)
+    R2sum, R, l2norm_phi[0] = l2normMSD(phi, S, dx2, dy2)
+    Rzero = R.copy()
+    D = R.copy()
+    Dstar = R.copy()
+    
+    for iteration in range(1,maxiters):
+        phi, D, Dstar = CGSstep(phi, S, R, R2sum, Rzero, D, Dstar, dx2, dy2)
+        R2sum, R, l2norm_phi[iteration] = l2normMSD(phi, S, dx2, dy2)
+        if l2norm_phi[iteration] < epsilon:
+            break
+    phi_CGS = phi.copy()
+    l2norm_CGS = l2norm_phi.copy()
+   
+
    
 
 
     # plt.figure(1)
     # plt.subplot(121)
-    # plt.contourf(x,y,phi_CG)
+    # plt.contourf(x,y,phi_CGS)
     # plt.colorbar()
     # plt.title('4th Order FD - Tri-diag')
     # plt.subplot(122)
-    # plt.contourf(x,y,np.abs(phi_analytical-phi_CG))
+    # plt.contourf(x,y,np.abs(phi_analytical-phi_CGS))
     # # plt.contourf(x,y,phi_gauss)
     # plt.colorbar()
     # plt.title('Numerical-Analytical Absolute Error')
@@ -185,6 +221,7 @@ if __name__ == "__main__":
     plt.semilogy(np.arange(len(l2norm_gauss)), l2norm_gauss, label="Gauss-Seidel")
     plt.semilogy(np.arange(len(l2norm_MSD)), l2norm_MSD, label="MSD")
     plt.semilogy(np.arange(len(l2norm_CG)), l2norm_CG, label="CG")
+    plt.semilogy(np.arange(len(l2norm_CGS)), l2norm_CGS, label="CGS")
     plt.xlim((-1000,25000))
     #plt.ylim((0,10**6))
     plt.xlabel("Iterations")
