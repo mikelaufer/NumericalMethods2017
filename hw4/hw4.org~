@@ -1,0 +1,123 @@
+* ADI Iterative Scheme - 4th Order Poisson 
+** Problem
+Given the Poisson equation:
+\[
+\frac{\partial^{2} \phi}{\partial x^{2}} + \frac{\partial^{2} \phi}{\partial y^{2}} = S_{\phi}
+\]
+Where $S_{\phi}$ is defined as:
+\[
+S_{\phi} = 50000 \exp \left[ -50 \left{ \left( 1 - x )^{2} + y^{2} \right} \right] \cdot \left[ 100 \left{ \left( 1 - x \right)^{2} + y^{2} \right} -2 \right]
+\]
+Derichlet boundary conditions are given as functions defined on the unit square domain boundary. \\
+The system has an analytical solution given by:
+\[
+\phi \left( x,y \right) = 500 exp \left( -50 \left{ \left( 1 - x \right)^{2} +y^{2} \right} \right) + 100x \left( 1 - y \right)
+\]
+
+Using a second order central differencing equation leads to the following scheme, which we have discussed at length in previous assignments.
+\[
+-\left( \frac{2}{ \left( \Delta x \right) ^{2}} + \frac{2}{ \left( \Delta y \right) ^{2}} \right) \phi_{i,j} + \frac{1}{ ( \Delta x )^{2} } \phi_{i+1,j} + \frac{1}{ ( \Delta x )^{2} } \phi_{i-1,j} + \frac{1}{ ( \Delta y )^{2} } \phi_{i,j+1} + \frac{1}{ ( \Delta y )^{2} } \phi_{i,j-1}=S_{i,j}
+\]
+
+This equation is solved at each node leading to a system of $n_{x}n_{y}$ equations. 
+We will be examining a number of iterative methods to solve the system of equations. 
+In particular, the system will be solved using the following methods:
+1. Jacobi Method
+2. Gauss-Seidel Method
+3. Method of Steepest Descent (MSD)
+4. Conjugate Gradient Method (CG)
+5. Conjugate Gradient Squared Method (CGS) 
+
+
+** Jacobi Method
+In this method, the equations are rearranged such that all terms except the the diagonal term are transposed to the right-hand side of the equation. Additionaly the entire equaiton is divided byt he diagonal coeffcient yeilding the scheme:
+\[
+\phi_{k}^{n+1} = \frac{Q_{k} - \sum\limits_{j=1 \\ j \neq k}^{N_{nb,k}} a_{j} \phi_{j}^{n}}{a_{k}}
+\]
+In effect, values of $\phi$ are updated at each iteration in a totally explicit manner, where all reference values are taken as values from the previous iteration. It is important to note at this point that due to this fact, values can be updated in a parallel or vectorized manner, where all values in the solution array are updated concurrently. The computational costs of this will be explored later on in this assignment.
+
+** Gauss-Seidel Method
+This method is very similiar to the Jacobi method, but values that have been just computed in the current iteration are used where possible.This allows for more up to date data to be used compared to Jacobi, and thus allows boundary conditions to propogate at a faster rate thorughout the domain leadign to a smaller number of iterations to acheive convergence than Jacobi. The Gauss-Seidel scheme is defined as:
+\[
+\phi_{k}^{n+1} = \frac{Q_{k} - \sum\limits_{j=1 \\ j \neq k}^{N_{nbu,k}} a_{j} \phi_{j}^{n+1} - \sum\limits_{j=1 \\ j \neq k}^{N_{nb,k} - N_{nbu,k} } a_{j} \phi_{j}^{n} }{a_{k}}      
+\]
+We can see here that values must be updated one by one, a process that cannot be parallelized or vectorized. We can infer here that this method will require a double for loop to loop over all the elements in the domain. In a dynamically typed language such as python, this in general leads to a slow computation.  In order to accelrate this type of solver, Numba is employed, bringing C-like performance (this has been coveraed at length in HW3). Solving times of both an accelerated and pure-Python version of Gauss-Seidel will be compared to a vectorized version of the Jacobi method. 
+
+** Method of Steepest Descent (MSD)
+This method is different than other methods explored up to now. This method solves an optimation problem of the following function:
+\[
+f(\phi_{1}, \phi_{2},..... \phi_{K}) = \frac{1}{2} [\phi]^{T} [A] [\phi] - [Q]^{T} [\phi] +c
+\]
+Assuming a symetric $A$ matrix, which is correct in our Poisson eqaution, taking a gradient of this function and equating to zero (finding a local optimum of the function)  leads to:
+\[
+\grad f = [A][\phi] - [Q] = 0
+\]
+Which is exactly the eqation we are trying to solve.
+Additionally, we can show that the residual vector is equal to the negative of the gradient vector, which as we know points in the direction of the steepest decent/ascent of the function.  
+Thus starting from an initial guess and travelling in the direction of the gradient vecotor (negative residual vector) leads us to the optimum, or solution to the given problem. As a consequnce, subsequent search directions are orthogonal to each other.
+
+The book outlines a method to do just this on page 149, but it is pertinent to note that the algorithm shown utilizes a series of double and single for loops in each iteration. The code actually implemented has no for loops and is purely a vectorized operation (see appendix for implementation). 
+
+** Conjugate Gradient Method (CG)
+The Conjugate Gradient method  is very similiar to the Method of Steepest Descent, but instead of searching in a stair-step pattern (due to the orthoganility of successive search directions in MSD), a linear of combination the old direction vector and newly computed direction vector is used. This porduces a more smoothly convergent computation, generally leading to lower iteration counts. This too has been implemented in a fully vectorized manner, acclerating computational time.
+ 
+** Conjugate Gradient Squared Method (CGS) 
+Lastly, the Conjugate Gradient Squated method circumvents the limitation of the MSD and CG method where the $A$ matrix must be symemtric, a limitation that makes those methods unusable in many enginnering calculations. Interestingly, this method has been shown to yield the exact solution to a problem in no more than $N_{x}N_{y}$ iterations. As with the other methods except for Gauss-Seidel, this mehod has been implemented in a vectorized manner. 
+ 
+
+
+
+** Convergence Criterion
+Convergence is monitored with the use of the $L^{2}Norm$ defined as:
+\[
+R2 = \sqrt{ \sum_{k=1}^{K} ( R_{k})^{2} }
+\]
+where:
+\[
+R_{k}^{n} = Q_{k} -a_{k} \phi_{k}^{n} - \sum_{j=1 \\ j \neq k}^{N_{nb,k}}  a_{j} \phi_{j}^{n}  
+\]
+
+For a 2nd order scheme this computation involves iterating over every node and accessing 4 neighboring nodes. A better approach is to use vectorized code, and notice that matrix addition can be used to replace the expensive double for loop. This is illustrated in the following python snippet.
+#+BEGIN_SRC python
+@jit
+def l2norm(phi, S, dx2, dy2):
+    Rk =S[1:-1,1:-1] +((2/dx2) + (2/dy2))*phi[1:-1,1:-1] - (1/dx2)*phi[1:-1,2:] - (1/dx2)*phi[1:-1,0:-2]  - (1/dy2)*phi[2:,1:-1] - (1/dy2)*phi[0:-2,1:-1] 
+    Rksquared = np.multiply(Rk,Rk)
+    return (math.sqrt(Rksquared.sum()))
+#+END_SRC
+
+
+** Results
+All methods were solved till $l^{2}Norm$ fell below 10e-7.
+Solution, and error contour plots are first plotted for the Jacobi method to show convergence to the exact solution. 
+
+#+ATTR_LATEX: :width 12cm 
+[[./figures/solution.png]]
+
+We can see that the iterative method solution agrees well with the analytical result.
+A 3d plot of the solution is seen in the following figure:
+#+ATTR_LATEX: :width 12cm 
+[[./figures/3d.png]]
+
+Residuals for all of the methods examined is given in the following figure:
+#+ATTR_LATEX: :width 12cm 
+[[./figures/residual1.png]]
+
+Additionally focusing in on the two fastest methods, the CG method and CGS method gives:
+#+ATTR_LATEX: :width 12cm 
+[[./figures/residual2.png]]
+
+
+** Discussion
+It is clear that 
+Lastly we will take a look at running times of each method (see appendix for code) using pure Python, and Numba optimized code.
+
+|---------------+-------------+---------------|
+| Configuration | Runtime [s] | % of baseline |
+|---------------+-------------+---------------|
+| Pure Python   |         288 | 100 %         |
+| Numba         |         8.5 | 2.9%          |
+|---------------+-------------+---------------|
+
+\newpage
+* Appendix: Python Code

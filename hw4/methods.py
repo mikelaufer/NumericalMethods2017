@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import time
 from scipy.linalg import *
 from numba import jit, prange
 from mpl_toolkits.mplot3d import Axes3D
@@ -14,13 +15,12 @@ from matplotlib import cm
 #     return(math.sqrt(Rksquared.sum()))
 
 
-@jit
+
 def l2norm(phi, S, dx2, dy2):
     Rk =S[1:-1,1:-1] +((2/dx2) + (2/dy2))*phi[1:-1,1:-1] - (1/dx2)*phi[1:-1,2:] - (1/dx2)*phi[1:-1,0:-2]  - (1/dy2)*phi[2:,1:-1] - (1/dy2)*phi[0:-2,1:-1] 
     Rksquared = np.multiply(Rk,Rk)
     return (math.sqrt(Rksquared.sum()))
 
-@jit
 def l2normMSD(phi, S, dx2, dy2):
     ny, nx = phi.shape
     Rk = np.zeros((ny,nx))
@@ -57,7 +57,7 @@ def MSDstep(phi, S, R, R2sum, dx2, dy2):
     alpha = R2sum/rtc
     return( phin + alpha*R)
 
-@jit
+
 def CGstep(phi, S, R, R2sum, D, dx2, dy2):
     nx,ny = phi.shape
     phin = phi.copy()
@@ -122,6 +122,7 @@ if __name__ == "__main__":
 
 
     # Jacobi solve
+    t0 = time.time()
     phiold = phi.copy()
     l2norm_phi = np.zeros(maxiters)
     for iteration in range(maxiters):
@@ -132,8 +133,11 @@ if __name__ == "__main__":
             break
     phi_jacobi = phi.copy()
     l2norm_jacobi = l2norm_phi.copy()
-
+    time_jacobi = time.time() - t0
+    iteration_jacobi = iteration
+    
      # Gauss-Seidel solve
+    t0 = time.time()
     phi = np.copy(phistart)
     phiold = np.copy(phistart)
     l2norm_phi = np.zeros(maxiters)
@@ -144,8 +148,11 @@ if __name__ == "__main__":
             break
     phi_gauss = phi.copy()
     l2norm_gauss = l2norm_phi.copy()
+    time_gauss = time.time() - t0
+    iteration_gauss = iteration
 
     # MSD solve
+    t0 = time.time()
     phi = np.copy(phistart)
     phiold = np.copy(phistart)
     l2norm_phi = np.zeros(maxiters)
@@ -157,8 +164,11 @@ if __name__ == "__main__":
             break
     phi_MSD = phi.copy()
     l2norm_MSD = l2norm_phi.copy()
+    time_MSD = time.time() - t0
+    iteration_MSD = iteration
 
     # CG solve
+    t0 = time.time()
     phi = np.copy(phistart)
     phiold = np.copy(phistart)
     l2norm_phi = np.zeros(maxiters)
@@ -171,8 +181,11 @@ if __name__ == "__main__":
             break
     phi_CG = phi.copy()
     l2norm_CG = l2norm_phi.copy()
+    time_CG = time.time() - t0
+    iteration_CG = iteration
 
-    # # CGS solve
+    # CGS solve
+    t0 = time.time()
     phi = np.copy(phistart)
     phiold = np.copy(phistart)
     l2norm_phi = np.zeros(maxiters)
@@ -188,53 +201,61 @@ if __name__ == "__main__":
             break
     phi_CGS = phi.copy()
     l2norm_CGS = l2norm_phi.copy()
-   
+    time_CGS = time.time() - t0
+    iteration_CGS = iteration
 
-   
+    print(" Iteration Number")
+    print("Jacobi: %f"%iteration_jacobi)
+    print("Gauss-seidel: %f"%iteration_gauss)
+    print("MSD: %f"%iteration_MSD)
+    print("CG: %f"%iteration_CG)
+    print("CGS: %f"%iteration_CGS)
 
-
-    # plt.figure(1)
-    # plt.subplot(121)
-    # plt.contourf(x,y,phi_CGS)
-    # plt.colorbar()
-    # plt.title('4th Order FD - Tri-diag')
-    # plt.subplot(122)
-    # plt.contourf(x,y,np.abs(phi_analytical-phi_CGS))
-    # # plt.contourf(x,y,phi_gauss)
-    # plt.colorbar()
-    # plt.title('Numerical-Analytical Absolute Error')
-    # plt.show()
-
-
-    # plt.figure(2)
-    # plt.subplot(121)
-    # plt.contourf(x,y,phi_penta)
-    # plt.colorbar()
-    # plt.title('4th Order FD - Penta-diag')
-    # plt.subplot(122)
-    # plt.contourf(x,y,np.abs(phi_analytical-phi_penta))
-    # plt.colorbar()
-    # plt.title('Numerical-Analytical Absolute Error')
     
-    plt.figure(3)
+    print("SOLVING TIME")
+    print("Jacobi: %f"%time_jacobi)
+    print("Gauss-seidel: %f"%time_gauss)
+    print("MSD: %f"%time_MSD)
+    print("CG: %f"%time_CG)
+    print("CGS: %f"%time_CGS)
+
+    plt.figure(1)
+    plt.subplot(121)
+    plt.contourf(x,y,phi_jacobi)
+    plt.colorbar()
+    plt.title('2nd Order CD Poisson - Jacobi')
+    plt.subplot(122)
+    plt.contourf(x,y,np.abs(phi_analytical-phi_jacobi))
+    plt.colorbar()
+    plt.title('Numerical-Analytical Absolute Error')
+        
+    plt.figure(2)
     plt.semilogy(np.arange(len(l2norm_jacobi)), l2norm_jacobi, label="Jacobi")
     plt.semilogy(np.arange(len(l2norm_gauss)), l2norm_gauss, label="Gauss-Seidel")
     plt.semilogy(np.arange(len(l2norm_MSD)), l2norm_MSD, label="MSD")
     plt.semilogy(np.arange(len(l2norm_CG)), l2norm_CG, label="CG")
     plt.semilogy(np.arange(len(l2norm_CGS)), l2norm_CGS, label="CGS")
-    plt.xlim((-1000,25000))
-    #plt.ylim((0,10**6))
+    plt.xlim((-100,25000))
     plt.xlabel("Iterations")
     plt.ylabel("Residual, R2")
     plt.legend()
     plt.grid(True)
+    
+    plt.figure(3)
+    plt.semilogy(np.arange(len(l2norm_CG)), l2norm_CG, label="CG")
+    plt.semilogy(np.arange(len(l2norm_CGS)), l2norm_CGS, label="CGS")
+    plt.xlim((0,400))
+    plt.xlabel("Iterations")
+    plt.ylabel("Residual, R2")
+    plt.legend()
+    plt.grid(True)
+
+    fig = plt.figure(figsize=(11, 7), dpi=100)
+    ax = fig.gca(projection='3d')
+    ax.plot_surface(xx, yy, phi_analytical, cmap=cm.viridis, rstride=2, cstride=2)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+    plt.title('2nd Order Poisson - Jacobi 81x81')
     plt.show()
 
-    # fig = plt.figure(figsize=(11, 7), dpi=100)
-    # ax = fig.gca(projection='3d')
-    # ax.plot_surface(xx, yy, phi_analytical, cmap=cm.viridis, rstride=2, cstride=2)
-    # ax.set_xlabel('x')
-    # ax.set_ylabel('y')
-    # ax.set_zlabel('z')
-    # plt.title('2nd Order Poisson')
-    # plt.show()
