@@ -1,4 +1,4 @@
-* Iterative Schemes - 4th Order Poisson 
+* Iterative Schemes - 2nd Order Poisson 
 ** Problem
 Given the Poisson equation:
 \[
