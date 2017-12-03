@@ -27,7 +27,7 @@ dy2 = dy*dy
 
 for i in range(1, nx-1):
     for j in range(1, ny-1):
-        k = (j-1)*nx + i -1
+        k = (j)*nx + i
         A[k,k] = -(2.0/dx2 + 2.0/dy2)
         A[k, k-1] = 1/dx2
         A[k, k+1] = 1/dx2
@@ -38,28 +38,28 @@ for i in range(1, nx-1):
 # Left Boundary
 i = 0
 for j in range(ny):
-    k = (j-1)*nx + i -1
+    k = (j)*nx + i
     A[k,k] = 1
     Q[k]  = phi_left[j]
 
 # Right Boundary
 i = nx - 1
 for j in range(ny):
-    k = (j-1)*nx + i -1
+    k = (j)*nx + i
     A[k,k] = 1
     Q[k]  = phi_right[j]
 
 # Bottom Boundary
 j = 0
 for i in range(nx):
-    k = (j-1)*nx + i -1
+    k = (j)*nx + i
     A[k,k] = 1
     Q[k]  = phi_bottom[i]
 
 # Top Boundary
 j = ny - 1
 for i in range(nx):
-    k = (j-1)*nx + i -1
+    k = (j)*nx + i
     A[k,k] = 1
     Q[k]  = phi_top[i]
 
@@ -68,7 +68,7 @@ phi2d = np.zeros((nx,ny))
 phi1d = np.linalg.solve(A,Q)    
 for i in range(nx):
     for j in range(ny):
-        k = (j-1)*nx + i - 1
+        k = (j)*nx + i
         phi2d[j,i] = phi1d[k]
 
 # Absolute error
