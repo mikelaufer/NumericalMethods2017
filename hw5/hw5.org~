@@ -1,0 +1,78 @@
+* Euler Explicit  
+** Problem
+Given the 1D heat conduction equation with no source term:
+#+BEGIN_LaTeX
+\frac{\partial \phi}{\partial t} = \frac{\partial^{2} \phi}{\partial x^{2}}  
+#+END_LaTeX
+testing 
+
+** Forward Euler Scheme
+** Results
+All methods were solved till $l^{2}Norm$ fell below 10e-7.
+Solution, and error contour plots are first plotted for the Jacobi method to show convergence to the exact solution. 
+
+#+ATTR_LATEX: :width 12cm 
+[[./figures/solution.png]]
+
+We can see that the iterative method solution agrees well with the analytical result.
+A 3d plot of the solution is seen in the following figure:
+#+ATTR_LATEX: :width 12cm 
+[[./figures/3d.png]]
+
+Residuals for all of the methods examined is given in the following figure:
+#+ATTR_LATEX: :width 12cm 
+[[./figures/residual1.png]]
+
+Additionally focusing in on the two fastest methods, the CG method and CGS method gives:
+
+#+ATTR_LATEX: :width 12cm 
+[[./figures/residual2.png]]
+
+The total number of iterations to the convergence of $l^{2}Norm$ below 10e-7 is tabulated in the following table:
+|--------------+--------------------------|
+| Method       | Iterations on 81x81 Grid |
+|--------------+--------------------------|
+| Jacobi       | 31,419                   |
+| Gauss-Seidel | 15,710                   |
+| MSD          | 32,860                   |
+| CG           | 325                      |
+| CGS          | 236                      |
+|--------------+--------------------------|
+
+** Discussion
+It is clear that the CG and CGS methods are by far the most efficient in regards to iterations to convergence. Additionally, similar to results in the book on page 157, the Gauss-Seidel solver solved around half the number of iterations, compared to the Jacobi solver. Interestingly, considering the MSD method is in the same family as both CG and CGS, the total number of iterations is even higher than the "naive" Jacobi method, this too is consistent with results in the book in example 3.8.   
+When looking closely at the CG method vs the CGS method, we can see that the CGS method shows erratic performance at the onset of the computation, lagging behind CG. Shortly afterwards, the CGS method rapidly overtakes CG and converges mot rapidly to the solution.
+
+As we have seen before, the number of iterations is not the whole picture, the total computation time is of most importance, especially in applied computations.  The computational time for all 5 methods, both with and without Numba acceleration can be observed in the following table. Note, that computations were performed on a Intel 2-core i5-4200U @ 1.6ghz base-clock with 4 GB of RAM.
+|--------------+---------------------+--------+------------------------------|
+| Method       | Pure Python (Numpy) | Numba  | Fastest Compared to Baseline |
+|--------------+---------------------+--------+------------------------------|
+| Jacobi       |                7.47 | *6.53* |                          78% |
+| Gauss-Seidel |                 241 | *3.62* |                          43% |
+| MSD          |                9.27 | *8.29* |                         100% |
+| CG           |             *0.144* | 1.07   |                         1.7% |
+| CGS          |             *0.122* | 1.21   |                         1.4% |
+|--------------+---------------------+--------+------------------------------|
+
+We fist see that due to the double for loop inherent in the pure python Gauss-Seidel method (which cannot be vectorized), the Jacobi method is over 4 times faster the GS method. But Numba is found to be able to  acclerate the Gauss-Seidel method by a factor of 65 and actually performs better than the highest performing Jacobi.  This shows both the power of vectorized code, but also the speed up possible with using a Just-In-Time (JIT) accelerator like Numba.  
+
+We can also observe that the CG and CGS methods are actually fastest in their fully vectorized pure Python versions without Numba. Here Numba dramatically slows down the code due to the overhead involved with compiling the code. 
+
+5 independent methods have been used to solve our original Poisson equation, and a large variance in number of iterations needed for convergence, and solving time is seen.
+
+\newpage
+* Appendix: Python Code
+#+BEGIN_SRC python
+
+#+END_SRC
+
+* Org and Latex config :noexport:
+#+title: HW5 Numerical Methods Fall 2017
+#+AUTHOR: Michael Laufer
+# Don't make a title page
+#+OPTIONS: toc:nil
+#+BIND: org-export-latex-t
+#+latex_header: \input {preamble.tex}
+
+
+  

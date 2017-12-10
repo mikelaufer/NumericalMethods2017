@@ -1,12 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set_style('whitegrid')
 
 if __name__ == "__main__":
     # parameters
-    nx = 52
-    dx = 1 / (nx - 1)
-    dt = 0.00001
-    finaltime = 0.8
+    nx = 26
+    dx = 1.0 / (nx - 1)
+    dt = 0.25*(dx**2)
+    finaltime = 1.0
 
     x = np.linspace(0,1,nx)
     nt = int(finaltime/dt)
@@ -38,19 +40,15 @@ if __name__ == "__main__":
                       Cn[3]*np.exp((-(lamb[3]**2))*n*dt)*np.cos(lamb[3]*x)
 
     plt.plot(x, phi_01, label='Forward Euler 0.1')
-    plt.plot(x, phi_anal[int(0.1/dt)], label='Analytical 0.1')
     plt.plot(x, phi_02, label='Forward Euler 0.2')
-    plt.plot(x, phi_anal[int(0.2/dt)], label='Analytical 0.2')
     plt.plot(x, phi_04, label='Forward Euler 0.4')
-    plt.plot(x, phi_anal[int(0.4/dt)], label='Analytical 0.4')
-    
-    
-    
+    plt.plot(x, phi_08, label='Forward Euler 0.8')
+    plt.plot(x, phi_anal[int(0.1/dt)], '--', label='Analytical 0.1')
+    plt.plot(x, phi_anal[int(0.2/dt)], '--', label='Analytical 0.2')
+    plt.plot(x, phi_anal[int(0.4/dt)], '--', label='Analytical 0.4')
+    plt.plot(x, phi_anal[int(0.8/dt)], '--', label='Analytical 0.8')
+    plt.xlabel('x')
+    plt.ylabel(r'$\phi$')    
     plt.legend()
     plt.show()
-    
-    
-        
-    
-    
     
