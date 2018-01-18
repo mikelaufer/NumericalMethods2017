@@ -334,5 +334,3 @@ if __name__ == "__main__":
 #+BIND: org-export-latex-t
 #+latex_header: \input {preamble.tex}
 
-
-  
