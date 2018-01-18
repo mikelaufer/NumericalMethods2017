@@ -1,0 +1,11 @@
+* Todo for project [1/4]
+ - [X] Find where diffusion coeficient is used in code.
+ - [X] Implement diffusion at faces
+ - [X] Robin BC
+** TODO Find where diffusion coeficient is used in code
+** DONE Implement diffusion at faces
+** TODO Neuman BC
+ - Need to verify that it works
+** TODO Robin BC
+ -k*grad(x) = h(T_b - t_inf)
+--> alpha = -k, beta = -h, gamma = -h*T_inf

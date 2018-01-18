@@ -1,0 +1,8 @@
+* Todo for project [0/1]
+ - [ ] Find where diffusion coeficient is used in code.
+ - [ ] Implement diffusion at faces
+ - [ ] Robin BC
+** TODO Find where diffusion coeficient is used in code
+** TODO Implement diffusion at faces
+** TODO Robin BC
+** TODO Neuman BC

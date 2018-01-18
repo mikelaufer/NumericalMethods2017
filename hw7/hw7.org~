@@ -1,0 +1,7 @@
+* 7.1 Gauss-divergence theorem
+** a. Area of Triangle
+Area (volume in 2D) is given by equation 7.39:
+\[
+V_{0}=\sum n_{x,f}x_{f}A_{f}
+\]
+

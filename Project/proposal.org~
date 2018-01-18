@@ -1,0 +1,7 @@
+* Org and Latex config :noexport:
+#+title: HW5 Numerical Methods Fall 2017
+#+AUTHOR: Michael Laufer
+# Don't make a title page
+#+OPTIONS: toc:nil
+#+BIND: org-export-latex-t
+#+latex_header: \input {preamble.tex}

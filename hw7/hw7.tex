@@ -1,0 +1,202 @@
+% Created 2018-01-01 Mon 22:33
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{minted}
+\author{mike}
+\date{\today}
+\title{}
+\hypersetup{
+ pdfauthor={mike},
+ pdftitle={},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 25.3.1 (Org mode 9.1.4)}, 
+ pdflang={English}}
+\begin{document}
+
+\tableofcontents
+
+\section{7.1 Gauss-divergence theorem}
+\label{sec:org577de4b}
+Area (volume in 2D) is given by equation 7.40:
+\[
+V_{0}=\frac{1}{2} \left( \sum_{1}^{N_{f,O}} n_{x,f}x_{f}A_{f} + \sum_{1}^{N_{f,O}} n_{y,f}y_{f}A_{f} \right)
+\]
+and in 3D:
+\[
+V_{0}=\frac{1}{3} \left( \sum_{1}^{N_{f,O}} n_{x,f}x_{f}A_{f} + \sum_{1}^{N_{f,O}} n_{y,f}y_{f}A_{f} + \sum_{1}^{N_{f,O}} n_{z,f}z_{f}A_{f} \right)
+\]
+
+
+The face normals in 2D, n\(_{\text{x,f}}\), are computed by first calculating the unit tangent along the faces:
+\[
+t_{x,f}=\frac{x_{2}-x_{1}}{A_{f}}
+\]
+
+\[
+t_{y,f}=\frac{x_{2}-x_{1}}{A_{f}}
+\]
+
+Next the normal vector now be computed in 2D:
+\[
+n_{y,f} = -t_{x,f}
+\]
+
+\[
+n_{x,f} = t_{y,f}
+\]
+For 3D, using the tangent vectors \(t_{1}\), \(t_{2}\) (just vector substraction of vertices, not the \textbf{unit} tangent vector):
+\[
+n = t_{1} \times t_{2}
+\]
+or 
+\[
+n=(t_{1y}t_{2z} -t_{1z}t_{2y}) \hat{i} + (t_{1z}t_{2x} -t_{1x}t_{2z}) \hat{j} + (t_{1x}t_{2y} -t_{1y}t_{2x}) \hat{j}
+\]
+The face areas, \(A_{f}\) in 2D are just the line length given by the Pythagorean theorem. While in 3D, they are given as:
+\[
+A_{f} = \frac{1}{1} |t_{1} \times t_{2}| = \frac{1}{2} |n|
+\]
+Lastly, the face centroid components, \(x_{f}\), \(y_{f}\) are given as:
+\[
+x_{f}=\frac{1}{A_{f}} \int_{S_{f}} x dA
+\]
+
+\[
+y_{f}=\frac{1}{A_{f}} \int_{S_{f}} y dA
+\]
+
+\[
+z_{f}=\frac{1}{A_{f}} \int_{S_{f}} z dA
+\]
+
+
+
+\subsection{Computations:}
+\label{sec:org74c94ea}
+\subsubsection{a. Triangle given by points: (1,2), (3,5), (-1,1)}
+\label{sec:org979675f}
+
+Faces numbering:
+\begin{enumerate}
+\item (1,2) to (3,5)
+\item (3,5) to (-1,1)
+\item (-1,1) to (1,2)
+\end{enumerate}
+
+\[
+ A_{f,1} = \sqrt{(5-2)^{2} + (3-1)^{2}} = \sqrt{13}
+ \]
+
+\[
+ A_{f,2} = \sqrt{(1-5)^{2} + (-1-3)^{2}} = \sqrt{32}
+ \]
+
+\[
+ A_{f,3} = \sqrt{(2-1)^{2} + (1+1)^{2}} = \sqrt{5}
+ \]
+
+\[
+ x_{f,1} = \frac{1+3}{2}=2, \  y_{f,1} = \frac{2+5}{2}=3.5 
+ \]
+\[
+ x_{f,2} = \frac{3-1}{2}=1, \  y_{f,2} = \frac{5+1}{2}=3 
+ \]
+\[
+ x_{f,3} = \frac{-1+1}{2}=0, \  y_{f,3} = \frac{1+2}{2}=1.5 
+ \]
+
+\[
+ t_{x,f,1} = \frac{3-1}{A_{f,1}} = 0.554 = -n_{y,f,1}, \ t_{y,f,1} = \frac{5-2}{A_{f,1}} = 0.832 = n_{x,f,1}
+ \]
+
+\[
+ t_{x,f,2} = \frac{-1-3}{A_{f,2}} = -0.707 = -n_{y,f,2} , \ t_{y,f,2} = \frac{1-5}{A_{f,2}} = -0.707 = n_{x,f,2}
+ \]
+
+\[
+ t_{x,f,3} = \frac{1+1}{A_{f,3}} = 0.894 = -n_{y,f,3}, \ t_{y,f,3} = \frac{2-1}{A_{f,3}} = 0.447 = n_{x,f,3}
+ \]
+
+Finally the area of the triangle can be computed:
+\[
+ V_{0}=\frac{1}{2} \left( 6- 4 +0) + (-7 + 12 -3) \right) = 2
+ \]
+
+\subsubsection{b.Tetrahedron given by points: (1,1,1), (1,4,3), (-2,1,4), (4,-2,1)}
+\label{sec:orgdb2802e}
+Points numbering:
+\begin{enumerate}
+\item (1,1,1)
+\item (1,4,3)
+\item (-2,1,4)
+\item (4,-2,1)
+\end{enumerate}
+
+faces numbering:
+\begin{enumerate}
+\item includes points: 1,2,3
+\item includes points: 2,3,4
+\item includes points: 3,4,1
+\item includes points: 4,1,2
+\end{enumerate}
+
+Tangent vectors can be calculated as the vector difference :
+\begin{itemize}
+\item Face 1:
+\end{itemize}
+\[
+t_{1,2} = [0,3,2]
+\]
+\[
+t_{1,3} = [-3,0,3]
+\]
+\[
+n_{1} = t_{1,2} \times t_{1,3}= [9,-6,9]
+\]
+\begin{itemize}
+\item Face 2:
+\end{itemize}
+\[
+t_{3,4} = [6,-3,-3]
+\]
+\[
+n_{2} = t_{2,3} \times t_{3,4}= [12,-3,27]
+\]
+\begin{itemize}
+\item Face 3:
+\end{itemize}
+\[
+t_{4,1} = [-3,3,0]
+\]
+
+\[
+n_{3} = t_{3,4} \times t_{4,1}= [9,9,9]
+\]
+\begin{itemize}
+\item Face 4:
+\end{itemize}
+\[
+n_{4} = t_{4,1} \times t_{1,2}= [6,6,-9]
+\]
+Using the fact that \(A_{f} = \frac{1}{2} |n|\), and face centroid values:
+\[
+V_{0}=\frac{1}{3} \left( \sum_{1}^{N_{f,O}} n_{x,f}x_{f}A_{f} + \sum_{1}^{N_{f,O}} n_{y,f}y_{f}A_{f} + \sum_{1}^{N_{f,O}} n_{z,f}z_{f}A_{f} \right) = 7.5
+\]
+
+\section{7.2 Calculating average \(\nabla \phi\):}
+\label{sec:org9838576}
+\end{document}
