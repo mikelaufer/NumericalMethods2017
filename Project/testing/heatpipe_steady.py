@@ -3,23 +3,18 @@ import numpy as np
 import gmsh_reader as gr
 from scipy.sparse import lil_matrix, csc_matrix
 from scipy.sparse.linalg import spsolve
-from numba import jit, njit, prange
+#from numba import jit, njit, prange
 import time
 
 
 #  Parameters
 k_nom = 400.0
-rhoc_nom = 8940.0*376.8
 T_inf = 22.0  # Ambient temp
 h = 100.0  # Convection coef
 heat_flux = (40.0/(0.03**2))
 meshname = 'heatpipe1.msh'
 fname = 'phi_heatpipe' # VTU output file name
-tolerance = 1e-7
-max_iter = 3
-final_time = 400.0 #sec
-dt = 0.2 # sec
-
+tolerance = 1e-10
 
 msh = gr.GmshReader(meshname)
 Nfaces = msh.faces.size
@@ -41,7 +36,6 @@ dirichlet_faces_val = msh.dirichlet_faces_val
 neumann_faces = msh.neumann_faces
 robin_faces = msh.robin_faces
 adiabatic_faces = msh.adiabatic_faces
-volumes = msh.volumes
 
 # Convection (Robin BC) constants
 alpha = -k_nom
@@ -52,21 +46,17 @@ alpha_div_beta = alpha/beta
 
 # initialize variables
 b = np.zeros(nelements)
-phi = np.ones(nelements)*T_inf
-phi_old = np.ones(nelements)*T_inf
+phi = np.zeros(nelements)
 phi_vert = np.zeros(npoints)
 
 
 
 print
-print('{:<30}'.format('Setting Cell Material Coefficients...'))
+print('{:<30}'.format('Setting Cell Diffusion Coefficients...'))
 k_elements = k_nom*np.ones(nelements)
-rhoc_elements = rhoc_nom*np.ones(nelements)
 for elem_index in range(nelements):
     if msh.cents[elem_index][1] > 0.005 and msh.cents[elem_index][1] < 0.03:
             k_elements[elem_index] = 10000.0
-            rhoc_elements[elem_index] = rhoc_nom
-
 
 print
 print('{:<30}'.format('Computing Face Diffusion Coefficients...\n'))
@@ -108,8 +98,7 @@ def vertices_interpolate(phi_vert, phi):  # interpolate to the vertices
         phi_vert[i] = interp_sum
     return phi_vert
 
-#@njit(nogil=True, parallel=True)
-#@njit
+#@jit(nogil=True, parallel=True)
 def compute_interior_faces(A, b):
     #for elem_index in prange(nelements):
     for elem_index in range(nelements):
@@ -131,11 +120,31 @@ def compute_interior_faces(A, b):
                 tmp1                     += k_faces[face_index]*ds/deltaf              # Eq. 7.96a
                 A[elem_index, nbr_index] = -k_faces[face_index]*ds/deltaf              # Eq. 7.96b
                 skew                     += k_faces[face_index]*phi_diff/deltaf*tdotI  # Eq. 7.96c
-        time_A = rhoc_elements[elem_index]*volumes[elem_index]/dt
-        time_b = (rhoc_elements[elem_index]*volumes[elem_index]/dt)*phi_old[elem_index]
-        A[elem_index, elem_index] = tmp1 + time_A
-        b[elem_index] = -skew + time_b
+
+        A[elem_index, elem_index] = tmp1
+        b[elem_index] = -skew
     return (A, b)
+def compute_robin_faces(A, b):
+    # assemble coefficient & rhs for all Robin faces
+    for tmp_face_index, face_index in enumerate(robin_faces):
+        elem_index      = f2e[face_index, 0]
+        elem_face_index = -1
+
+        for tmp_index in range(elem_nfaces):
+            if e2f[elem_index, tmp_index] == face_index:
+                elem_face_index = tmp_index
+                break
+        
+        deltaf = elinks[elem_index, elem_face_index, 0]
+        tdotI  = elinks[elem_index, elem_face_index, 1]
+        ds     = face_areas[face_index]
+
+        node1, node2 = xfaces[face_index]
+
+        b[elem_index] -= ds*k_faces[face_index]*(-gamma_div_beta/(deltaf + alpha_div_beta) + (phi_vert[node2]-phi_vert[node1])*tdotI/(ds*(deltaf + alpha_div_beta)))
+
+        A[elem_index, elem_index] += k_faces[face_index]*ds/(deltaf + alpha_div_beta)
+    return(A, b)
 
 #@njit
 def compute_neumann_faces(b):
@@ -179,36 +188,63 @@ def compute_adiabatic_faces(b):
     return(b)
 
 if __name__ == '__main__':
-    t = 0.0
-    timesteps = 0
-    while t < final_time:
-        timesteps += 1
-        iteration = 0
-        t += dt
-        norm = -1
-        phi_old[:] = phi[:]
-        
-        converged = False
-        print('\nTime: %f'%(t))
-                        
-        while not converged:
-            iteration += 1
-            A = lil_matrix((nelements, nelements))
-            b[:]   = 0.0
+    converged = False
+    iteration = 0
+    norm = -1
+    max_iter = 50
+
+    t0 = time.time()
+    while not converged:
+        iteration += 1
+        A = lil_matrix((nelements, nelements))
+        b[:]   = 0.0
     
-            phi_vert = vertices_interpolate(phi_vert, phi)   # interpolate to vertices
+        # interpolate to vertices
+        phi_vert = vertices_interpolate(phi_vert, phi)  
+    
+        # assemble the coefficient and rhs matrix for allfaces
+        A, b = compute_interior_faces(A, b)
+        b = compute_neumann_faces(b)
+        b = compute_adiabatic_faces(b)
+        A, b = compute_robin_faces(A, b)
+           
+        phi_new = spsolve(A.tocsc(), b)
+        norm = np.linalg.norm(phi-phi_new)
+        if (norm < tolerance or iteration >= max_iter):
+            print('Converged in %d iterations'%iteration)
+            converged = True
+            break
 
-            A, b = compute_interior_faces(A, b)  # assemble the coefficient and rhs matrix for allfaces
-            A, b = compute_robin_faces(A, b)
-            b = compute_neumann_faces(b)
-            b = compute_adiabatic_faces(b)
+        print('Iteration %d, Error = %g'%(iteration, norm))
+
+        phi[:] = phi_new[:]
+    t1 = time.time()
+    print(t1-t0)
+    # write out solution
+    gr.write_vtk_ugrid(fname, msh, phi)
+
+
+
+
+
+# @jit
+# def compute_dirichlet_faces(A, b):
+#     for tmp_face_index, face_index in enumerate(dirichlet_faces):
+#         elem_index      = f2e[face_index, 0]
+#         elem_face_index = -1
+
+#         for tmp_index in range(elem_nfaces):
+#             if e2f[elem_index, tmp_index] == face_index:
+#                 elem_face_index = tmp_index
+#                 break
         
-            phi_new = spsolve(A.tocsc(), b)
-            norm = np.linalg.norm(phi-phi_new)
-            print('Iteration %d, Error = %g'%( iteration, norm))
-            if (norm < tolerance or iteration >= max_iter):
-                converged = True
-            phi[:] = phi_new[:]
+#         deltaf = elinks[elem_index, elem_face_index, 0]
+#         tdotI  = elinks[elem_index, elem_face_index, 1]
+#         ds     = face_areas[face_index]
 
-        gr.write_vtk_ugrid(fname + '_' + str(timesteps), msh, phi)
-    #gr.write_vtk_ugrid(fname + '_' + str(t), msh, phi)
+#         node1, node2 = xfaces[face_index]
+
+#         b[elem_index] -= k_faces[face_index]*(-dirichlet_faces_val[tmp_face_index]*ds/deltaf + (phi_vert[node2]-phi_vert[node1])*tdotI/deltaf)
+
+#         A[elem_index, elem_index] += k_faces[face_index]*ds/deltaf
+#     return(A, b)

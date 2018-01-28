@@ -1,0 +1,18 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{compute\PYGZus{}robin\PYGZus{}faces}\PYG{p}{(}\PYG{n}{A}\PYG{p}{,} \PYG{n}{b}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} assemble coefficient \PYGZam{} rhs for all Robin faces}
+    \PYG{k}{for} \PYG{n}{tmp\PYGZus{}face\PYGZus{}index}\PYG{p}{,} \PYG{n}{face\PYGZus{}index} \PYG{o+ow}{in} \PYG{n+nb}{enumerate}\PYG{p}{(}\PYG{n}{robin\PYGZus{}faces}\PYG{p}{):}
+	\PYG{n}{elem\PYGZus{}index}      \PYG{o}{=} \PYG{n}{f2e}\PYG{p}{[}\PYG{n}{face\PYGZus{}index}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}
+	\PYG{n}{elem\PYGZus{}face\PYGZus{}index} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}
+	\PYG{k}{for} \PYG{n}{tmp\PYGZus{}index} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{elem\PYGZus{}nfaces}\PYG{p}{):}
+	    \PYG{k}{if} \PYG{n}{e2f}\PYG{p}{[}\PYG{n}{elem\PYGZus{}index}\PYG{p}{,} \PYG{n}{tmp\PYGZus{}index}\PYG{p}{]} \PYG{o}{==} \PYG{n}{face\PYGZus{}index}\PYG{p}{:}
+		\PYG{n}{elem\PYGZus{}face\PYGZus{}index} \PYG{o}{=} \PYG{n}{tmp\PYGZus{}index}
+		\PYG{k}{break}
+	\PYG{n}{deltaf} \PYG{o}{=} \PYG{n}{elinks}\PYG{p}{[}\PYG{n}{elem\PYGZus{}index}\PYG{p}{,} \PYG{n}{elem\PYGZus{}face\PYGZus{}index}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}
+	\PYG{n}{tdotI}  \PYG{o}{=} \PYG{n}{elinks}\PYG{p}{[}\PYG{n}{elem\PYGZus{}index}\PYG{p}{,} \PYG{n}{elem\PYGZus{}face\PYGZus{}index}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{]}
+	\PYG{n}{ds}     \PYG{o}{=} \PYG{n}{face\PYGZus{}areas}\PYG{p}{[}\PYG{n}{face\PYGZus{}index}\PYG{p}{]}
+	\PYG{n}{node1}\PYG{p}{,} \PYG{n}{node2} \PYG{o}{=} \PYG{n}{xfaces}\PYG{p}{[}\PYG{n}{face\PYGZus{}index}\PYG{p}{]}
+	\PYG{n}{b}\PYG{p}{[}\PYG{n}{elem\PYGZus{}index}\PYG{p}{]} \PYG{o}{\PYGZhy{}=} \PYG{n}{ds}\PYG{o}{*}\PYG{n}{k\PYGZus{}faces}\PYG{p}{[}\PYG{n}{face\PYGZus{}index}\PYG{p}{]}\PYG{o}{*}\PYG{p}{(}\PYG{o}{\PYGZhy{}}\PYG{n}{gamma\PYGZus{}div\PYGZus{}beta}\PYG{o}{/}\PYG{p}{(}\PYG{n}{deltaf} \PYG{o}{+} \PYG{n}{alpha\PYGZus{}div\PYGZus{}beta}\PYG{p}{)} \PYG{o}{+} \PYG{p}{(}\PYG{n}{phi\PYGZus{}vert}\PYG{p}{[}\PYG{n}{node2}\PYG{p}{]}\PYG{o}{\PYGZhy{}}\PYG{n}{phi\PYGZus{}vert}\PYG{p}{[}\PYG{n}{node1}\PYG{p}{])}\PYG{o}{*}\PYG{n}{tdotI}\PYG{o}{/}\PYG{p}{(}\PYG{n}{ds}\PYG{o}{*}\PYG{p}{(}\PYG{n}{deltaf} \PYG{o}{+} \PYG{n}{alpha\PYGZus{}div\PYGZus{}beta}\PYG{p}{)))}
+	\PYG{n}{A}\PYG{p}{[}\PYG{n}{elem\PYGZus{}index}\PYG{p}{,} \PYG{n}{elem\PYGZus{}index}\PYG{p}{]} \PYG{o}{+=} \PYG{n}{k\PYGZus{}faces}\PYG{p}{[}\PYG{n}{face\PYGZus{}index}\PYG{p}{]}\PYG{o}{*}\PYG{n}{ds}\PYG{o}{/}\PYG{p}{(}\PYG{n}{deltaf} \PYG{o}{+} \PYG{n}{alpha\PYGZus{}div\PYGZus{}beta}\PYG{p}{)}
+    \PYG{k}{return}\PYG{p}{(}\PYG{n}{A}\PYG{p}{,} \PYG{n}{b}\PYG{p}{)}
+\end{Verbatim}

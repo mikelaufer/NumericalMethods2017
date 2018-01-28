@@ -1,0 +1,147 @@
+# org-ref-default-bibliography: report.bib
+
+\begin{abstract}
+
+This is the abstract.
+
+\end{abstract}
+
+* Introduction
+
+  Electronics cooling  technologies have cite:versteeg1995introduction 
+
+one more  
+* Project Motivation
+blah blha 
+* Numerical Method
+The governing equation in our steady state heat conduction problem is the 2d heat equation, essentially the Poisson equation with a diffusion constant (in this case the thermal conductivity).
+\[
+\nabla \cdot ( \Gamma \nabla \phi ) = S_{\phi}
+\]
+As per the Finite Volume Method, the equation is integrated over the volume of each cell, whereby with the use of the Gauss divergence theorem, the resulting equation is seen in equation 7.13 and 7.14 in the class textbook cite:mazumder2015numerical.
+\[
+\int_{V_{0}} \nabla \cdot ( \Gamma \nabla \phi ) dV =  \int_{S} ( \Gamma \nabla \phi ) \cdot \hat{n} dA
+\]
+
+\[
+ \int_{S} ( \Gamma \nabla \phi ) \cdot \hat{n} dA = \sum_{f=1}_{N_{f,O}} \left[ ( \Gamma \nabla \phi )_{f} \cdot \hat{n} \right] A_{f}
+\]
+In 2D cartisian coordinates the value of the flux at the cell faces is straightforward. The book goes into great detail showing how the flux can be evaluated using a coordinate system with basis vectors in the face normal, and face tangential direction. 
+From equation 7.50 in the book:
+\[
+( \nabla \phi ) \cdot \hat{nf} = \frac{(\nabla \phi )_{f} \cdot I_{f}}{\delta_{f}}} - \frac{\left[ (\nabla \phi )_{f} \cdot \hat{t}_{f} \right] \hat{t}_{f} \cdot I_{f} }{\delta_{f}}
+\]
+The face tangent directional component of the flux, is evaluated using the values of \phi at the vertex locations, but as only cell center values are known, an expression for the vertex values as a function of cell center values must be used. This leads to the expression given in equation 7.58:
+\[
+( \nabla \phi ) \cdot \hat{nf} = \sum_{f=1}^{N_{f,O}}\Gamma_{f} \left( \frac{\phi_{N_{f}} - \phi_{O} }{\delta_{f}} - \left[ \frac{\phi_{a,f} - \phi_{b,f}}{\delta_{f} A_{f}} \right] \hat{t_{f}}} \cdot I_{f} \right) A_{f}
+\]
+In general two variations of the scheme can be formulated. One, an implicit approach, whereby substituting expressions for the vertex values given in equation 7.36 in the book, leads to an equation containing only cell center values. A second approach, one used in this work, is to treat the vertex values explicitly, leading to an iterative approach, where the vertex values from the previous iteration are used. The explicit approach is significantly easier to implement, as the only unknowns are adjacent cell center values. On the other hand, in the implicit approach, a less sparse coefficient matrix will be formed, owing to the fact that the stencil now extends beyond the immediate neighbors. The explicit approach is more commonly used than the implicit approach, and it is the one used in this work.
+
+The implementation of the scheme for the steady state case is as follows:
+1. Interpolate vertex values from cell center values.
+2. Loop over every cell face, add respective link value contribution to the coefficient matrix and RHS vector for every internal face (not boundary node)
+3. Loop over each face requiring special boundary treatment, and add the contribution to the coefficient matrix and RHS vector.
+4. Solve the sparse system
+5. Compute norm of solution, and check for convergence. If not converged, return to step 1.
+
+This is implemented in the "main" of the python code in the following easy-to-follow code snippet:
+
+** Boundary Conditions
+The heatpipe based cooler that we are trying to model has 3 boundary conditions:
+1. Heat flux from the electronic component on the bottom surface of the cooler
+2. Adiabatic surfaces on the sides of the cooler
+3. Convective heat transfer from the fin surfaces
+
+*** Heat Flux Boundary Condition
+The heat flux on the bottom of the cooler is essentially a Neumann boundary condition. The contribution of the corresponding face to the RHS vector is just the heat flux value itself, $J_{B}. 
+\[
+(\nabla \phi_{B} ) \cdot \hat{n}_{B} = J_{B}
+\]
+
+This is implemented in the following function that returns the new RHS vector:
+#+BEGIN_SRC python
+    if __name__ == '__main__':
+	converged = False
+	iteration = 0
+	norm = -1
+	max_iter = 50
+	t0 = time.time()
+	while not converged:
+	    iteration += 1
+	    A = lil_matrix((nelements, nelements))
+	    b[:]   = 0.0
+	    # interpolate to vertices
+	    phi_vert = vertices_interpolate(phi_vert, phi)  
+	    # assemble the coefficient and rhs matrix for allfaces
+	    A, b = compute_interior_faces(A, b)
+	    b = compute_neumann_faces(b)
+	    b = compute_adiabatic_faces(b)
+	    A, b = compute_robin_faces(A, b)
+	    phi_new = spsolve(A.tocsc(), b)
+	    norm = np.linalg.norm(phi-phi_new)
+	  
+	    if (norm < tolerance or iteration >= max_iter):
+		print('Converged in %d iterations'%iteration)
+		converged = True
+		break
+
+	    print('Iteration %d, Error = %g'%(iteration, norm))
+
+	    phi[:] = phi_new[:]
+
+#+END_SRC
+
+#+BEGIN_SRC python
+def compute_neumann_faces(b):
+    # assemble coefficient & rhs for all Neumann faces
+    for tmp_face_index, face_index in enumerate(neumann_faces):
+        elem_index = f2e[face_index, 0]
+        ds         = face_areas[face_index]
+        b[elem_index] += heat_flux*ds
+    return(b)
+#+END_SRC
+
+*** Adiabatic Boundary Condition
+The adiabatic boundary condition can be thought of as a Neumann boundary condition where the spatial derivative is zero. This leads to the straightforward implementation shown in the following function
+
+
+
+
+The book then derives expressions for the flux at 
+A fully unstructured Finite Volume Method code was used to solve the steady and unsteady heat equation. The steady state numerical method derivation follows the book 
+* Grid Generation
+blah blah cite:versteeg1995introduction  
+* Steady State Results
+blah blah
+* Transient Results
+blah blah
+* Summary and Conclusions
+blah blah 
+\newpage
+* Appendix A - Steady State Code
+blah blah
+\newpage
+* Appendix B - Unsteady Code
+ blah blah   
+
+# Insert Bibliography
+bibliography:report.bib
+bibliographystyle:abbrvnat
+
+
+* Org and Latex config :noexport:
+#+title: Steady State and Transient Thermal Simulation of a 2D Heatpipe-based Cooler for Mobile Processors
+#+AUTHOR: Michael Laufer
+# Don't make a title page
+#+OPTIONS: toc:nil
+#+BIND: org-export-latex-t
+#+latex_header: \input {preamble.tex}
+#+LaTeX_HEADER: \usepackage[T1]{fontenc} 
+#+LaTeX_HEADER: \usepackage{libertine}
+#+LaTeX_HEADER: \renewcommand*\oldstylenums[1]{{\fontfamily{fxlj}\selectfont #1}}
+#+LaTeX_HEADER: \usepackage{lmodern}
+# Bibliography stuff
+#+LATEX_HEADER: \usepackage{natbib}
+
+
+ 

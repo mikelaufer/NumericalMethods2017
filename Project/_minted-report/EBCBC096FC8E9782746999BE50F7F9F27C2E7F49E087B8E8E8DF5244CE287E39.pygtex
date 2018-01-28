@@ -1,0 +1,27 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s1}{\PYGZsq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZsq{}}\PYG{p}{:}
+    \PYG{n}{converged} \PYG{o}{=} \PYG{n+nb+bp}{False}
+    \PYG{n}{iteration} \PYG{o}{=} \PYG{l+m+mi}{0}
+    \PYG{n}{norm} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}
+    \PYG{n}{max\PYGZus{}iter} \PYG{o}{=} \PYG{l+m+mi}{50}
+    \PYG{n}{t0} \PYG{o}{=} \PYG{n}{time}\PYG{o}{.}\PYG{n}{time}\PYG{p}{()}
+    \PYG{k}{while} \PYG{o+ow}{not} \PYG{n}{converged}\PYG{p}{:}
+	\PYG{n}{iteration} \PYG{o}{+=} \PYG{l+m+mi}{1}
+	\PYG{n}{A} \PYG{o}{=} \PYG{n}{lil\PYGZus{}matrix}\PYG{p}{((}\PYG{n}{nelements}\PYG{p}{,} \PYG{n}{nelements}\PYG{p}{))}
+	\PYG{n}{b}\PYG{p}{[:]}   \PYG{o}{=} \PYG{l+m+mf}{0.0}
+	\PYG{c+c1}{\PYGZsh{} interpolate to vertices}
+	\PYG{n}{phi\PYGZus{}vert} \PYG{o}{=} \PYG{n}{vertices\PYGZus{}interpolate}\PYG{p}{(}\PYG{n}{phi\PYGZus{}vert}\PYG{p}{,} \PYG{n}{phi}\PYG{p}{)}
+	\PYG{c+c1}{\PYGZsh{} assemble the coefficient and rhs matrix for allfaces}
+	\PYG{n}{A}\PYG{p}{,} \PYG{n}{b} \PYG{o}{=} \PYG{n}{compute\PYGZus{}interior\PYGZus{}faces}\PYG{p}{(}\PYG{n}{A}\PYG{p}{,} \PYG{n}{b}\PYG{p}{)}
+	\PYG{n}{b} \PYG{o}{=} \PYG{n}{compute\PYGZus{}neumann\PYGZus{}faces}\PYG{p}{(}\PYG{n}{b}\PYG{p}{)}
+	\PYG{n}{b} \PYG{o}{=} \PYG{n}{compute\PYGZus{}adiabatic\PYGZus{}faces}\PYG{p}{(}\PYG{n}{b}\PYG{p}{)}
+	\PYG{n}{A}\PYG{p}{,} \PYG{n}{b} \PYG{o}{=} \PYG{n}{compute\PYGZus{}robin\PYGZus{}faces}\PYG{p}{(}\PYG{n}{A}\PYG{p}{,} \PYG{n}{b}\PYG{p}{)}
+	\PYG{n}{phi\PYGZus{}new} \PYG{o}{=} \PYG{n}{spsolve}\PYG{p}{(}\PYG{n}{A}\PYG{o}{.}\PYG{n}{tocsc}\PYG{p}{(),} \PYG{n}{b}\PYG{p}{)}
+	\PYG{n}{norm} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linalg}\PYG{o}{.}\PYG{n}{norm}\PYG{p}{(}\PYG{n}{phi}\PYG{o}{\PYGZhy{}}\PYG{n}{phi\PYGZus{}new}\PYG{p}{)}
+	\PYG{k}{if} \PYG{p}{(}\PYG{n}{norm} \PYG{o}{\PYGZlt{}} \PYG{n}{tolerance} \PYG{o+ow}{or} \PYG{n}{iteration} \PYG{o}{\PYGZgt{}=} \PYG{n}{max\PYGZus{}iter}\PYG{p}{):}
+	    \PYG{k}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Converged in }\PYG{l+s+si}{\PYGZpc{}d}\PYG{l+s+s1}{ iterations\PYGZsq{}}\PYG{o}{\PYGZpc{}}\PYG{n}{iteration}\PYG{p}{)}
+	    \PYG{n}{converged} \PYG{o}{=} \PYG{n+nb+bp}{True}
+	    \PYG{k}{break}
+	\PYG{k}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Iteration }\PYG{l+s+si}{\PYGZpc{}d}\PYG{l+s+s1}{, Error = }\PYG{l+s+si}{\PYGZpc{}g}\PYG{l+s+s1}{\PYGZsq{}}\PYG{o}{\PYGZpc{}}\PYG{p}{(}\PYG{n}{iteration}\PYG{p}{,} \PYG{n}{norm}\PYG{p}{))}
+	\PYG{n}{phi}\PYG{p}{[:]} \PYG{o}{=} \PYG{n}{phi\PYGZus{}new}\PYG{p}{[:]}
+\end{Verbatim}

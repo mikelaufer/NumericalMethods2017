@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{def} \PYG{n+nf}{compute\PYGZus{}neumann\PYGZus{}faces}\PYG{p}{(}\PYG{n}{b}\PYG{p}{):}
+    \PYG{c+c1}{\PYGZsh{} assemble coefficient \PYGZam{} rhs for all Neumann faces}
+    \PYG{k}{for} \PYG{n}{tmp\PYGZus{}face\PYGZus{}index}\PYG{p}{,} \PYG{n}{face\PYGZus{}index} \PYG{o+ow}{in} \PYG{n+nb}{enumerate}\PYG{p}{(}\PYG{n}{neumann\PYGZus{}faces}\PYG{p}{):}
+	\PYG{n}{elem\PYGZus{}index} \PYG{o}{=} \PYG{n}{f2e}\PYG{p}{[}\PYG{n}{face\PYGZus{}index}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}
+	\PYG{n}{ds}         \PYG{o}{=} \PYG{n}{face\PYGZus{}areas}\PYG{p}{[}\PYG{n}{face\PYGZus{}index}\PYG{p}{]}
+	\PYG{n}{b}\PYG{p}{[}\PYG{n}{elem\PYGZus{}index}\PYG{p}{]} \PYG{o}{+=} \PYG{n}{heat\PYGZus{}flux}\PYG{o}{*}\PYG{n}{ds}
+    \PYG{k}{return}\PYG{p}{(}\PYG{n}{b}\PYG{p}{)}
+\end{Verbatim}

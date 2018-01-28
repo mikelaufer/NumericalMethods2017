@@ -1,0 +1,17 @@
+@book{versteeg1995introduction,
+  title={An Introduction to Computational Fluid Dynamics: The Finite Volume Approach},
+  author={Versteeg, H.K. and Malalasekera, W.},
+  isbn={9780582218840},
+  url={https://books.google.co.il/books?id=7UynjgEACAAJ},
+  year={1995},
+  publisher={Longman Scientific \& Technical}
+}
+
+@electronic{Rub1,
+ author = {Rubino, Daniel},
+ editor = {{Windows Phone Central}},
+ title = {IE9 for Windows Phone 7: Adobe Flash, demos and development},
+ url = {http://www.wpcentral.com/ie9-windows-phone-7-adobe-flash-demos-and-development-videos},
+ urldate = {14.01.2013},
+ originalyear = {18.02.2011}
+}

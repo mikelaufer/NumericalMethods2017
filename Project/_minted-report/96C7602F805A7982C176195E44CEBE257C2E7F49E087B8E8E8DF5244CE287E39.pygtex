@@ -1,0 +1,21 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}:\PYGZlt{}30\PYGZcb{}\PYGZsq{}}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Computing Face Diffusion Coefficients...}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{))}
+\PYG{n}{k\PYGZus{}faces} \PYG{o}{=} \PYG{l+m+mi}{400}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{(}\PYG{n}{msh}\PYG{o}{.}\PYG{n}{nfaces}\PYG{p}{)}
+\PYG{k}{for} \PYG{n}{face\PYGZus{}index} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{msh}\PYG{o}{.}\PYG{n}{nfaces}\PYG{p}{):}
+    \PYG{k}{if} \PYG{n}{face\PYGZus{}index} \PYG{o+ow}{not} \PYG{o+ow}{in} \PYG{n}{msh}\PYG{o}{.}\PYG{n}{bfaces}\PYG{p}{:}
+	\PYG{n}{element\PYGZus{}index\PYGZus{}1} \PYG{o}{=} \PYG{n}{msh}\PYG{o}{.}\PYG{n}{f2e}\PYG{p}{[}\PYG{n}{face\PYGZus{}index}\PYG{p}{,}\PYG{l+m+mi}{0}\PYG{p}{]}
+	\PYG{n}{k\PYGZus{}element\PYGZus{}1} \PYG{o}{=}  \PYG{n}{k\PYGZus{}elements}\PYG{p}{[}\PYG{n}{element\PYGZus{}index\PYGZus{}1}\PYG{p}{]}
+	\PYG{k}{for} \PYG{n}{tmp\PYGZus{}index} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{msh}\PYG{o}{.}\PYG{n}{nelements}\PYG{p}{):}
+	    \PYG{k}{if} \PYG{n}{msh}\PYG{o}{.}\PYG{n}{e2f}\PYG{p}{[}\PYG{n}{element\PYGZus{}index\PYGZus{}1}\PYG{p}{,} \PYG{n}{tmp\PYGZus{}index}\PYG{p}{]} \PYG{o}{==} \PYG{n}{face\PYGZus{}index}\PYG{p}{:}
+		\PYG{n}{face\PYGZus{}index\PYGZus{}1} \PYG{o}{=} \PYG{n}{tmp\PYGZus{}index}
+		\PYG{k}{break}
+	\PYG{n}{dist\PYGZus{}element\PYGZus{}1} \PYG{o}{=} \PYG{n}{msh}\PYG{o}{.}\PYG{n}{elinks}\PYG{p}{[}\PYG{n}{element\PYGZus{}index\PYGZus{}1}\PYG{p}{,} \PYG{n}{face\PYGZus{}index\PYGZus{}1}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}
+	\PYG{n}{element\PYGZus{}index\PYGZus{}2} \PYG{o}{=} \PYG{n}{msh}\PYG{o}{.}\PYG{n}{f2e}\PYG{p}{[}\PYG{n}{face\PYGZus{}index}\PYG{p}{,}\PYG{l+m+mi}{1}\PYG{p}{]}
+	\PYG{n}{k\PYGZus{}element\PYGZus{}2} \PYG{o}{=}  \PYG{n}{k\PYGZus{}elements}\PYG{p}{[}\PYG{n}{element\PYGZus{}index\PYGZus{}2}\PYG{p}{]}
+	\PYG{k}{for} \PYG{n}{tmp\PYGZus{}index} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{msh}\PYG{o}{.}\PYG{n}{nelements}\PYG{p}{):}
+	    \PYG{k}{if} \PYG{n}{msh}\PYG{o}{.}\PYG{n}{e2f}\PYG{p}{[}\PYG{n}{element\PYGZus{}index\PYGZus{}2}\PYG{p}{,} \PYG{n}{tmp\PYGZus{}index}\PYG{p}{]} \PYG{o}{==} \PYG{n}{face\PYGZus{}index}\PYG{p}{:}
+		 \PYG{n}{face\PYGZus{}index\PYGZus{}2} \PYG{o}{=} \PYG{n}{tmp\PYGZus{}index}
+		 \PYG{k}{break}
+	\PYG{n}{dist\PYGZus{}element\PYGZus{}2} \PYG{o}{=} \PYG{n}{msh}\PYG{o}{.}\PYG{n}{elinks}\PYG{p}{[}\PYG{n}{element\PYGZus{}index\PYGZus{}2}\PYG{p}{,} \PYG{n}{face\PYGZus{}index\PYGZus{}2}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{]}
+	\PYG{n}{k\PYGZus{}faces}\PYG{p}{[}\PYG{n}{face\PYGZus{}index}\PYG{p}{]} \PYG{o}{=} \PYG{p}{(}\PYG{n}{k\PYGZus{}element\PYGZus{}1}\PYG{o}{*}\PYG{n}{k\PYGZus{}element\PYGZus{}2}\PYG{p}{)}\PYG{o}{/}\PYG{p}{((}\PYG{n}{k\PYGZus{}element\PYGZus{}1}\PYG{o}{*}\PYG{n}{dist\PYGZus{}element\PYGZus{}2} \PYG{o}{+} \PYG{n}{k\PYGZus{}element\PYGZus{}2}\PYG{o}{*}\PYG{n}{dist\PYGZus{}element\PYGZus{}1}\PYG{p}{)}\PYG{o}{/}\PYG{p}{(}\PYG{n}{dist\PYGZus{}element\PYGZus{}1} \PYG{o}{+} \PYG{n}{dist\PYGZus{}element\PYGZus{}2}\PYG{p}{))}
+\end{Verbatim}

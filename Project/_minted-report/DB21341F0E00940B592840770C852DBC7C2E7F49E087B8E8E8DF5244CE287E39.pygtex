@@ -1,0 +1,7 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k}{print}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}\PYGZob{}:\PYGZlt{}30\PYGZcb{}\PYGZsq{}}\PYG{o}{.}\PYG{n}{format}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Setting Cell Diffusion Coefficients...\PYGZsq{}}\PYG{p}{))}
+\PYG{n}{k\PYGZus{}elements} \PYG{o}{=} \PYG{n}{k\PYGZus{}nom}\PYG{o}{*}\PYG{n}{np}\PYG{o}{.}\PYG{n}{ones}\PYG{p}{(}\PYG{n}{nelements}\PYG{p}{)}
+\PYG{k}{for} \PYG{n}{elem\PYGZus{}index} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{nelements}\PYG{p}{):}
+    \PYG{k}{if} \PYG{n}{msh}\PYG{o}{.}\PYG{n}{cents}\PYG{p}{[}\PYG{n}{elem\PYGZus{}index}\PYG{p}{][}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZgt{}} \PYG{l+m+mf}{0.005} \PYG{o+ow}{and} \PYG{n}{msh}\PYG{o}{.}\PYG{n}{cents}\PYG{p}{[}\PYG{n}{elem\PYGZus{}index}\PYG{p}{][}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZlt{}} \PYG{l+m+mf}{0.03}\PYG{p}{:} \PYG{c+c1}{\PYGZsh{}checks if cell centroid is inside of heatpipe}
+	    \PYG{n}{k\PYGZus{}elements}\PYG{p}{[}\PYG{n}{elem\PYGZus{}index}\PYG{p}{]} \PYG{o}{=} \PYG{l+m+mf}{10000.0}
+\end{Verbatim}
