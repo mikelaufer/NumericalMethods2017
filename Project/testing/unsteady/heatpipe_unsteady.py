@@ -17,7 +17,7 @@ meshname = 'heatpipe1.msh'
 fname = 'phi_heatpipe' # VTU output file name
 tolerance = 1e-7
 max_iter = 3
-final_time = 400.0 #sec
+final_time = 800.0 #sec
 dt = 0.2 # sec
 
 
@@ -181,6 +181,7 @@ def compute_adiabatic_faces(b):
 if __name__ == '__main__':
     t = 0.0
     timesteps = 0
+    t0 = time.time()
     while t < final_time:
         timesteps += 1
         iteration = 0
@@ -211,4 +212,5 @@ if __name__ == '__main__':
             phi[:] = phi_new[:]
 
         gr.write_vtk_ugrid(fname + '_' + str(timesteps), msh, phi)
+    print(time.time()-t0)
     #gr.write_vtk_ugrid(fname + '_' + str(t), msh, phi)

@@ -1,4 +1,4 @@
-% Created 2018-01-28 Sun 12:05
+% Created 2018-01-29 Mon 22:57
 % Intended LaTeX compiler: pdflatex
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
@@ -41,38 +41,39 @@ This is the abstract.
 \end{abstract}
 
 \section{Introduction}
-\label{sec:org575075d}
+\label{sec:org595fbf9}
 
 Electronics cooling  technologies have \cite{versteeg1995introduction} 
 
 one more  
 \section{Project Motivation}
-\label{sec:org380d714}
+\label{sec:orgedad357}
 blah blha 
 \section{Numerical Method}
-\label{sec:org8e6c72c}
+\label{sec:orgd064d2e}
 \subsection{Steady State}
-\label{sec:org5d5c538}
+\label{sec:org1956150}
 The governing equation in our steady state heat conduction problem is the 2d heat equation, essentially the Poisson equation with a diffusion constant (in this case the thermal conductivity).
 \[
-\nabla \cdot ( \Gamma \nabla \phi ) = S_{\phi}
+\nabla \cdot ( k \nabla T ) = S_{T}
 \]
 As per the Finite Volume Method, the equation is integrated over the volume of each cell, whereby with the use of the Gauss divergence theorem, the resulting equation is seen in equation 7.13 and 7.14 in the class textbook \cite{mazumder2015numerical}.
 \[
-\int_{V_{0}} \nabla \cdot ( \Gamma \nabla \phi ) dV =  \int_{S} ( \Gamma \nabla \phi ) \cdot \hat{n} dA
+\int_{V_{0}} \nabla \cdot ( k \nabla T ) dV =  \int_{S} ( k \nabla T ) \cdot \hat{n} dA
 \]
 
 \[
- \int_{S} ( \Gamma \nabla \phi ) \cdot \hat{n} dA = \sum_{f=1}_{N_{f,O}} \left[ ( \Gamma \nabla \phi )_{f} \cdot \hat{n} \right] A_{f}
+ \int_{S} ( k \nabla T ) \cdot \hat{n} dA = \sum_{f=1}_{N_{f,O}} \left[ ( k \nabla T )_{f} \cdot \hat{n} \right] A_{f}
 \]
+[We note here that all equations have been modified to relate to heat conduction, i.e temperature, \(T\) as the dependant variable, as opposed to the generic \(\phi\)).] \newline
 In 2D cartisian coordinates the value of the flux at the cell faces is straightforward. The book goes into great detail showing how the flux can be evaluated using a coordinate system with basis vectors in the face normal, and face tangential direction. 
 From equation 7.50 in the book:
 \[
-( \nabla \phi ) \cdot \hat{nf} = \frac{(\nabla \phi )_{f} \cdot I_{f}}{\delta_{f}}} - \frac{\left[ (\nabla \phi )_{f} \cdot \hat{t}_{f} \right] \hat{t}_{f} \cdot I_{f} }{\delta_{f}}
+( \nabla T ) \cdot \hat{nf} = \frac{(\nabla T )_{f} \cdot I_{f}}{\delta_{f}}} - \frac{\left[ (\nabla T )_{f} \cdot \hat{t}_{f} \right] \hat{t}_{f} \cdot I_{f} }{\delta_{f}}
 \]
-The face tangent directional component of the flux, is evaluated using the values of \(\phi\) at the vertex locations, but as only cell center values are known, an expression for the vertex values as a function of cell center values must be used. This leads to the expression given in equation 7.58:
+The face tangent directional component of the flux, is evaluated using the values of T at the vertex locations, but as only cell center values are known, an expression for the vertex values as a function of cell center values must be used. This leads to the expression given in equation 7.58:
 \[
-( \nabla \phi ) \cdot \hat{nf} = \sum_{f=1}^{N_{f,O}}\Gamma_{f} \left( \frac{\phi_{N_{f}} - \phi_{O} }{\delta_{f}} - \left[ \frac{\phi_{a,f} - \phi_{b,f}}{\delta_{f} A_{f}} \right] \hat{t_{f}}} \cdot I_{f} \right) A_{f}
+( \nabla T ) \cdot \hat{nf} = \sum_{f=1}^{N_{f,O}}k_{f} \left( \frac{T_{N_{f}} - T_{O} }{\delta_{f}} - \left[ \frac{T_{a,f} - T_{b,f}}{\delta_{f} A_{f}} \right] \hat{t_{f}}} \cdot I_{f} \right) A_{f}
 \]
 In general two variations of the scheme can be formulated. One, an implicit approach, whereby substituting expressions for the vertex values given in equation 7.36 in the book, leads to an equation containing only cell center values. A second approach, one used in this work, is to treat the vertex values explicitly, leading to an iterative approach, where the vertex values from the previous iteration are used. The explicit approach is significantly easier to implement, as the only unknowns are adjacent cell center values. On the other hand, in the implicit approach, a less sparse coefficient matrix will be formed, owing to the fact that the stencil now extends beyond the immediate neighbors. The explicit approach is more commonly used than the implicit approach, and it is the one used in this work.
 
@@ -115,20 +116,20 @@ if __name__ == '__main__':
 \end{minted}
 
 \subsubsection{Boundary Conditions}
-\label{sec:orga301617}
+\label{sec:org2f7883c}
 The heatpipe based cooler that we are trying to model has 3 boundary conditions:
-\begin{enumerate}
+\begin{itemize}
 \item Heat flux from the electronic component on the bottom surface of the cooler
 \item Adiabatic surfaces on the sides of the cooler
 \item Convective heat transfer from the fin surfaces
-\end{enumerate}
+\end{itemize}
 
 \begin{enumerate}
 \item Heat Flux Boundary Condition
-\label{sec:orgfd70d51}
+\label{sec:org101599d}
 The heat flux on the bottom of the cooler is essentially a Neumann boundary condition. The contribution of the corresponding face to the RHS vector is just the heat flux value itself, \$J\(_{\text{B}}\). 
 \[
- (\nabla \phi_{B} ) \cdot \hat{n}_{B} = J_{B}
+ (\nabla T_{B} ) \cdot \hat{n}_{B} = J_{B}
  \]
 
 This is implemented in the following function that returns the new RHS vector:
@@ -142,29 +143,29 @@ def compute_neumann_faces(b):
     return(b)
 \end{minted}
 \item Adiabatic Boundary Condition
-\label{sec:org1d2240d}
+\label{sec:org25650c9}
 The adiabatic boundary condition can be thought of as a Neumann boundary condition where the spatial derivative is zero. Or:
 \[
- (\nabla \phi_{B} ) \cdot \hat{n}_{B} = J_{B} = 0
+ (\nabla T_{B} ) \cdot \hat{n}_{B} = J_{B} = 0
  \]
-The implementation is thus rudimentary, as the contribution of the adiabatic face to the RHS vector is just zero.
+The implementation is thus rudimentary, as the contribution of the adiabatic face to the RHS vector is simply zero for each respective adiabatic face.
 \item Convective Heat Transfer Boundary Condition
-\label{sec:org1010037}
+\label{sec:orge7bf8d1}
 A convective heat transfer boundary condition relates the heat flux though a surface to the temperature difference of the surface and the ambient fluid temperature.
 \[
  \dot{Q} = hA_{f}(T_{S}-T_{\infty})
  \]
 We can recognize that this is a form of a Robin boundary condition. The text book gives a generic formula for the implementation of Robin boundary conditions in Equations 7.90:
 \[
- \alpha ( \nabla \phi_{B}) \cdot \hat{n_{B}} + \beta \phi_{B} = \gamma 
+ \alpha ( \nabla T_{B}) \cdot \hat{n_{B}} + \beta T_{B} = \gamma 
  \] 
 and the flux in equation 7.92:
 \[
- ( \nabla \phi ) \cdot \hat{nf} =  \left( \frac{\gamma}{\beta} -\phi_{O} - [(\nabla \phi)_{B} \cdot \hat{t}_{B}] \hat{t}_{B} \cdot I_{B} \right) / \left( \delta_{B} + \frac{\alpha}{\beta} \right)
+ ( \nabla T ) \cdot \hat{nf} =  \left( \frac{\gamma}{\beta} -T_{O} - [(\nabla T)_{B} \cdot \hat{t}_{B}] \hat{t}_{B} \cdot I_{B} \right) / \left( \delta_{B} + \frac{\alpha}{\beta} \right)
  \]
 
 Using the above equation we ascertain:
-\[ \alpha = \Gamma \] 
+\[ \alpha = k\] 
 \[ \beta = h \] 
 \[ \gamma = -h T_{\infty} \] 
 
@@ -189,12 +190,12 @@ def compute_robin_faces(A, b):
 \end{minted}
 \end{enumerate}
 \subsubsection{Material Properties}
-\label{sec:org6c35d19}
+\label{sec:org28e2809}
 The final important element in the numerical implementation of a heatpipe based cooler is dealing with the discontinuous material properties that are inherent in the problem. The heatpipe is a closed rod with a fluid that evaporates and turns to a vapor at the hot end, and due to density differences, moves to the cold end, where it condenses back down to a liquid state. This process allows the heatpipe to be a very efficient way of transporting large amounts heat over relatively long distances. This is often modelled as a material with an extremely high thermal conductivity, reaching values up to 100 times the thermal conductivity of copper. In this work, the thermal conductivity was chosen to be \(K_{heatpipe}=10000\). 
 This leads to a discontinuous thermal conductivity, which if implemented naively leads to inaccuracies during the cell center value to face value interpolation process. 
 One way to deal with this discontinuity is to use a an inverse distance-weighted interpolation for the thermal conductivty. This can be seen in equation 7.32b:
 \[
-  K_{f} = \frac{K_{1}K_{2}}{\frac{K_{1}\delta_{2} + K_{2}\delta_{1}}{\delta_{1}+\delta_{2}}}
+  k_{f} = \frac{k_{1}k_{2}}{\frac{k_{1}\delta_{2} + k_{2}\delta_{1}}{\delta_{1}+\delta_{2}}}
   \]
 
 To implement this 2 additional pre-proccessing steps are needed. First a new array called \(K_{elements}\) is created that contains the values of the thermal conductivity for each cell volume. The values are determined by the location of the centroids of each cell.
@@ -229,29 +230,44 @@ for face_index in range(msh.nfaces):
 	k_faces[face_index] = (k_element_1*k_element_2)/((k_element_1*dist_element_2 + k_element_2*dist_element_1)/(dist_element_1 + dist_element_2))
 \end{minted}
 
+\subsection{Unsteady}
+\label{sec:org9647855}
+Unsteady heat conduction is governed by the following equation:
+\[
+\rho c_{p} \frac{\partial T}{\partial t} =\nabla \cdot ( k\nabla T )
+\]
+The derivation of the unsteady FVM scheme is very similar to the steady case, except that in addition to integrating over each cell volume, both sides of the equation are integrating over a time period.
+\[
+FILL IN
+\]
+
+A fully implicit approach was chosen to deal with the numerical time integration. Although it is only 1st order accurate in time, the fully implicit method is unconditionally stable, as any time step period may be chosen without stability issues. Implementing an implicit solver is important as the ultimate goal of this work is for it to be used as an engineering tool, moreover it will be just one function call inside of a larger script. The ability to arbitrarily change the time step to match the time step of a global script is paramount. Additionally, the accuracy penalty of this approach compared to a second order Crank-Nicholson scheme is not important, as the future engineering tool is required to be just a rough estimate of a consumer cooler.  
 
 \section{Grid Generation}
-\label{sec:org889dec9}
+\label{sec:org1e03d6b}
 blah blah \cite{versteeg1995introduction}  
 \section{Steady State Results}
-\label{sec:org01e5289}
+\label{sec:org7b48318}
 blah blah
 \section{Transient Results}
-\label{sec:org1ef16e2}
+\label{sec:org877e0d1}
 blah blah
 \section{Summary and Conclusions}
-\label{sec:org1051a86}
+\label{sec:org3279b62}
 blah blah 
 \newpage
 \section{Appendix A - GMSH grid generation script}
-\label{sec:orge51f918}
+\label{sec:org436b19a}
+
+\nepage
 \section{Appendix B - Steady State Code}
-\label{sec:orgd8f4e75}
+\label{sec:org43dd9dc}
 blah blah
 \newpage
 \section{Appendix C - Unsteady Code}
-\label{sec:org7b80417}
+\label{sec:org3e385a1}
 blah blah   
+\newpage
 
 \bibliography{report}
 \bibliographystyle{abbrvnat}
